@@ -35,5 +35,21 @@ class UserPolicy
         return true;
     }
 
+    /**
+     * Allow all authenticated users to view any user (for debugging)
+     */
+    public function view(User $user, User $model)
+    {
+        \Log::info('UserPolicy@view (DEBUG: allow all roles)', [
+            'auth_user_id' => $user->id,
+            'auth_user_email' => $user->email,
+            'target_user_id' => $model->id,
+            'target_user_email' => $model->email,
+            'roles' => $user->getRoleNames()
+        ]);
+        // TODO: Restrict to SuperAdmin/self after debugging
+        return true;
+    }
+
     // Add other methods as needed (view, update, delete, etc.)
 }

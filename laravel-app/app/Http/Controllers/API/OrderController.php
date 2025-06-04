@@ -30,13 +30,33 @@ class OrderController extends Controller
     {
         $user = Auth::user();
         if ($user->hasRole('SuperAdmin')) {
-            return Order::with(['buyer', 'seller'])->paginate(20);
+            $orders = Order::with(['buyer', 'seller'])->paginate(20);
         } elseif ($user->hasRole('Seller')) {
-            return Order::with(['buyer', 'seller'])->where('seller_id', $user->id)->paginate(20);
+            $orders = Order::with(['buyer', 'seller'])->where('seller_id', $user->id)->paginate(20);
         } else {
             // Buyer
-            return Order::with(['buyer', 'seller'])->where('buyer_id', $user->id)->paginate(20);
+            $orders = Order::with(['buyer', 'seller'])->where('buyer_id', $user->id)->paginate(20);
         }
+
+        // Transform response to match frontend expectations
+        return response()->json([
+            'data' => $orders->items(),
+            'meta' => [
+                'current_page' => $orders->currentPage(),
+                'from' => $orders->firstItem(),
+                'last_page' => $orders->lastPage(),
+                'path' => $orders->path(),
+                'per_page' => $orders->perPage(),
+                'to' => $orders->lastItem(),
+                'total' => $orders->total(),
+            ],
+            'links' => [
+                'first' => $orders->url(1),
+                'last' => $orders->url($orders->lastPage()),
+                'prev' => $orders->previousPageUrl(),
+                'next' => $orders->nextPageUrl(),
+            ]
+        ]);
     }
 
     /**
