@@ -14,7 +14,7 @@ export default defineConfig({
     port: 5173,
     host: true, // allow external access
     allowedHosts: [
-      'c2aa-102-97-19-78.ngrok-free.app' // <-- add your ngrok tunnel here
+      '3ed5-102-97-19-78.ngrok-free.app' // <-- add your ngrok tunnel here
     ],
     proxy: {
       '/api': 'http://localhost:8000',
