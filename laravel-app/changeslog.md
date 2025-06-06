@@ -108,3 +108,13 @@
 4. Add image upload and management
 5. Implement search and filtering with more advanced criteria
 6. Set up API documentation with Swagger/OpenAPI
+
+## 2025-06-06 10:15:00 - Products APIs
+- Get dynamic data instead of static data in getAll and getOne product
+
+## 2025-06-06 03:58:00 - Users APIs
+- La method approveClient n'a pas une role maintenant.
+- il y'a une method 'authorize' ne trouve pas j'ai commenté.
+
+## 2025-06-06 03:58:00 - Orders APIs
+- Régler le probléme sur la méthode hasRole() 
