@@ -50,6 +50,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return $request->user();
     });
     
+    // Order Routes
+    Route::apiResource('orders', \App\Http\Controllers\API\OrderController::class);
+    Route::put('orders/{id}/approve', [\App\Http\Controllers\API\OrderController::class, 'approve']);
+    Route::put('orders/{id}/deliver', [\App\Http\Controllers\API\OrderController::class, 'deliver']);
+    Route::put('orders/{id}/cancel', [\App\Http\Controllers\API\OrderController::class, 'cancel']);
+
     // Hotel Routes
     Route::apiResource('hotels', HotelController::class);
     

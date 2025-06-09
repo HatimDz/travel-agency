@@ -17,6 +17,7 @@ import { UserDetailsView } from '@/components/dashboard/UserDetailsView';
 import { AnalyticsPage } from '@/components/dashboard/AnalyticsPage';
 import { ReportsPage } from '@/components/dashboard/ReportsPage';
 import { CalendarPage } from '@/components/dashboard/CalendarPage';
+import OrdersPage from '@/pages/dashboard/OrdersPage';
 import { SubSuperAdminDashboard } from '../components/dashboard/SubSuperAdminDashboard';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -63,7 +64,7 @@ export const DashboardRoutes: React.FC = () => {
         <Route path="analytics" element={<ComingSoon title="Analytics" />} />
         <Route path="reports" element={<ComingSoon title="Reports" />} />
         <Route path="calendar" element={<ComingSoon title="Calendar" />} />
-        <Route path="orders" element={<ComingSoon title="Orders" />} />
+        <Route path="orders" element={<OrdersPage />} />
         <Route path="transactions" element={<ComingSoon title="Transactions" />} />
         <Route path="revenue" element={<ComingSoon title="Revenue" />} />
         <Route path="customers" element={<ComingSoon title="Customers" />} />

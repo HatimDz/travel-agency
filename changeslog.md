@@ -1846,6 +1846,44 @@
   - Updated DatabaseSeeder to include ProductSeeder
   - Ensured proper JSON encoding for product details
   - Added validation for required fields
+## 2025-06-02 10:21:54
+
+### Backend Seeder & Frontend Orders Integration
+
+#### Architecture Summary
+- **Backend (Laravel API)**: Orders seeding via `OrderSeeder` with realistic buyers, sellers, statuses, and product data.
+- **Frontend (React/TypeScript)**: Orders dashboard fetches live seeded data from the backend API, not mock data.
+- **Data Flow**: Orders are seeded in the database and fetched by `/dashboard/orders` for real end-to-end testing.
+
+#### Model and Version Used
+- Cascade agentic AI (2025-06-02)
+
+#### User-Approved Logic Steps
+- Confirmed `OrderSeeder` is registered and seeded 20+ orders.
+- Ran `php artisan db:seed` to populate the backend with test orders.
+- Updated frontend config to use API data (`USE_MOCK_DATA = false`).
+- Ensured `/dashboard/orders` displays real seeded orders from the backend.
+
+## 2025-06-03 - Orders Dashboard Route Activation
+- Replaced the /dashboard/orders route placeholder with the actual OrdersPage component in DashboardRoutes.tsx.
+- OrdersPage now fetches and displays seeded orders from the backend for end-to-end testing.
+- Architecture: React (shadcn/ui) frontend, Laravel backend, REST API, service-based data flow.
+- Model: OrdersPage, orderService, Laravel OrderSeeder.
+- Feature flag: USE_MOCK_DATA=false, dashboard route points to OrdersPage.
+
+## 2025-06-03 - Orders Actions API Endpoints Enabled
+- Added custom endpoints for order actions (approve, deliver, cancel) in Laravel API routes (api.php).
+- Registered PUT /orders/{id}/approve, /deliver, /cancel mapped to OrderController methods.
+- Cleared route, config, and application cache to apply changes.
+- Frontend order actions (approve, deliver, cancel) should now work end-to-end.
+- Architecture: Laravel backend with RESTful + custom action routes, React (shadcn/ui) frontend.
+
+## 2025-06-03 - Orders API Pagination Format Fix
+- Fixed the backend orders API (OrderController@index) to return paginated data in the format `{ data, meta, links }` (with `meta.last_page`, etc.), matching the frontend's expectations.
+- This resolves the `Cannot read properties of undefined (reading 'last_page')` error in the Orders dashboard.
+- Cleared route, config, and application cache to apply changes.
+- Architecture: Laravel backend REST API, React (shadcn/ui) frontend.
+
 ## 2025-05-25 03:48:26
 ### API and Swagger Documentation
 - **API Endpoints**:
