@@ -104,14 +104,16 @@ class User extends Authenticatable
      * @param  string|array  $roles
      * @return bool
      */
-    public function hasRole($roles)
+    public function hasRole($roles): bool
     {
+        $userRoles = $this->roles()->pluck('name')->toArray();
+
         if (is_string($roles)) {
-            return $this->roles->contains('slug', $roles);
+            return in_array($roles, $userRoles);
         }
 
         if (is_array($roles)) {
-            return $this->roles->whereIn('slug', $roles)->isNotEmpty();
+            return count(array_intersect($roles, $userRoles)) > 0;
         }
 
         return false;

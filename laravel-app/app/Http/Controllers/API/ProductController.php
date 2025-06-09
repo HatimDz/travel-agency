@@ -99,9 +99,9 @@ class ProductController extends Controller
 
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -191,12 +191,12 @@ class ProductController extends Controller
         }
 
         $data = $validator->validated();
-$data['is_active'] = $request->input('is_active', true);
-$data['hotel_details'] = $request->input('hotel_details');
-$data['flight_details'] = $request->input('flight_details');
-$data['sport_details'] = $request->input('sport_details');
-$data['entertainment_details'] = $request->input('entertainment_details');
-$product = Product::create($data);
+        $data['is_active'] = $request->input('is_active', true);
+        $data['hotel_details'] = $request->input('hotel_details');
+        $data['flight_details'] = $request->input('flight_details');
+        $data['sport_details'] = $request->input('sport_details');
+        $data['entertainment_details'] = $request->input('entertainment_details');
+        $product = Product::create($data);
 
         return response()->json([
             'data' => $product,
@@ -322,11 +322,11 @@ $product = Product::create($data);
         }
 
         $data = $validator->validated();
-if ($request->has('hotel_details')) $data['hotel_details'] = $request->input('hotel_details');
-if ($request->has('flight_details')) $data['flight_details'] = $request->input('flight_details');
-if ($request->has('sport_details')) $data['sport_details'] = $request->input('sport_details');
-if ($request->has('entertainment_details')) $data['entertainment_details'] = $request->input('entertainment_details');
-$product->update($data);
+        if ($request->has('hotel_details')) $data['hotel_details'] = $request->input('hotel_details');
+        if ($request->has('flight_details')) $data['flight_details'] = $request->input('flight_details');
+        if ($request->has('sport_details')) $data['sport_details'] = $request->input('sport_details');
+        if ($request->has('entertainment_details')) $data['entertainment_details'] = $request->input('entertainment_details');
+        $product->update($data);
 
         return response()->json([
             'data' => $product,
