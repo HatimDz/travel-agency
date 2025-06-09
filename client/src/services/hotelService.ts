@@ -5,7 +5,7 @@ import { Hotel, HotelFormData, Room } from '../types/hotel';
 const mockHotels: Hotel[] = [
   {
     id: 1,
-    name: "Grand Plaza Hotel HHHH",
+    name: "Grand Plaza Hotel",
     description: "A luxurious 5-star hotel located in the heart of downtown with stunning city views.",
     location: "New York, NY",
     stars: 5,
@@ -20,7 +20,7 @@ const mockHotels: Hotel[] = [
   },
   {
     id: 2,
-    name: "Seaside Resort HHH",
+    name: "Seaside Resort",
     description: "Beautiful beachfront property with private access to the beach and water activities.",
     location: "Miami, FL",
     stars: 4,
@@ -35,7 +35,7 @@ const mockHotels: Hotel[] = [
   },
   {
     id: 3,
-    name: "Mountain View Lodge HHH",
+    name: "Mountain View Lodge",
     description: "Cozy lodge with stunning mountain views, perfect for nature lovers and hikers.",
     location: "Aspen, CO",
     stars: 4,
