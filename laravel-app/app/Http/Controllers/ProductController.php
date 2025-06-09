@@ -17,7 +17,7 @@ class ProductController extends Controller
     {
         // In a real application, this would fetch actual data from the database
         // For now, we're returning mock data
-        $products = Product::paginate(15);
+        $products = Product::paginate(20);
 
         return response()->json($products);
     }
