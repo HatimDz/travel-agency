@@ -27,66 +27,42 @@ export function WelcomePage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        setIsLoading(true);
-        setError(null);
-        const data = await getProducts({ isActive: true });
-        // Transform the data to match our Product type
-        const formattedProducts = data.map(product => {
-          // Use type assertion to handle API response having different property names than our Product type
-          const apiProduct = product as any;
-          return {
-            ...product,
-            isActive: apiProduct.is_active ?? true,
-            image: product.image || getDefaultImageByType(product.type),
-            rating: product.rating || 0,
-            location: product.location || 'Not specified'
-          };
-        });
-        setProducts(formattedProducts);
-      } catch (err: any) {
-        console.error('Failed to fetch products:', err);
-        
-        // Handle 401 Unauthorized error
-        if (err.response?.status === 401) {
-          // Don't show error toast for unauthorized, just log it
-          console.log('User not authenticated, showing limited content');
-          setProducts([]); // Clear products or show limited content
-          return;
-        }
-        
-        const errorMessage = err instanceof Error ? err.message : 'Failed to load products';
-        setError(errorMessage);
-        
-        // Only show toast if the component is still mounted
-        if (toast) {
-          toast({
-            title: 'Error',
-            description: errorMessage,
-            variant: 'destructive',
-          });
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  setIsLoading(true);
+  setError(null);
 
+      const response = await getProducts({ isActive: true });
+      const data = Array.isArray(response) ? response : response.data;
+
+      if (!Array.isArray(data)) {
+        throw new Error("API response is not an array.");
+      }
+
+      const formattedProducts = data.map(product => {
+        const apiProduct = product as any;
+        return {
+          ...product,
+          isActive: apiProduct.is_active ?? true,
+          image: product.image || getDefaultImageByType(product.type),
+          rating: product.rating || 0,
+          location: product.location || 'Not specified'
+        };
+      });
+
+      setProducts(formattedProducts);
+    } catch (err) {
+      console.error("Failed to fetch products:", err);
+      setError("Impossible de charger les produits.");
+    } finally {
+      setIsLoading(false);
+    }};
     fetchProducts();
-    
-    // Cleanup function to prevent state updates after unmount
     return () => {
-      // Any cleanup if needed
     };
   }, [toast]);
-
-  // Handle adding product to cart
   const handleAddToCart = async (productId: string) => {
     try {
-      // Track which product is being added to the cart
       setAddingToCart(prev => ({ ...prev, [productId]: true }));
-      
-      // Add item to cart with default quantity of 1
-      await addItem(productId, 1);
-      
+      await addItem(productId, 1);   
       toast({
         title: 'Success',
         description: 'Item added to your cart',
@@ -99,7 +75,6 @@ export function WelcomePage() {
         variant: 'destructive',
       });
     } finally {
-      // Reset loading state for this product
       setAddingToCart(prev => ({ ...prev, [productId]: false }));
     }
   };
