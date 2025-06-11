@@ -22,39 +22,40 @@ export function WelcomePage() {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const { addItem, isLoading: isCartLoading } = useCart();
-  const [addingToCart, setAddingToCart] = useState<{[key: string]: boolean}>({});
+  const [addingToCart, setAddingToCart] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-  setIsLoading(true);
-  setError(null);
+        setIsLoading(true);
+        setError(null);
 
-      const response = await getProducts({ isActive: true });
-      const data = Array.isArray(response) ? response : response.data;
+        const response = await getProducts({ isActive: true });
+        const data = Array.isArray(response) ? response : response.data;
 
-      if (!Array.isArray(data)) {
-        throw new Error("API response is not an array.");
+        if (!Array.isArray(data)) {
+          throw new Error("API response is not an array.");
+        }
+
+        const formattedProducts = data.map(product => {
+          const apiProduct = product as any;
+          return {
+            ...product,
+            isActive: apiProduct.is_active ?? true,
+            image: product.image || getDefaultImageByType(product.type),
+            rating: product.rating || 0,
+            location: product.location || 'Not specified'
+          };
+        });
+
+        setProducts(formattedProducts);
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+        setError("Impossible de charger les produits.");
+      } finally {
+        setIsLoading(false);
       }
-
-      const formattedProducts = data.map(product => {
-        const apiProduct = product as any;
-        return {
-          ...product,
-          isActive: apiProduct.is_active ?? true,
-          image: product.image || getDefaultImageByType(product.type),
-          rating: product.rating || 0,
-          location: product.location || 'Not specified'
-        };
-      });
-
-      setProducts(formattedProducts);
-    } catch (err) {
-      console.error("Failed to fetch products:", err);
-      setError("Impossible de charger les produits.");
-    } finally {
-      setIsLoading(false);
-    }};
+    };
     fetchProducts();
     return () => {
     };
@@ -62,7 +63,7 @@ export function WelcomePage() {
   const handleAddToCart = async (productId: string) => {
     try {
       setAddingToCart(prev => ({ ...prev, [productId]: true }));
-      await addItem(productId, 1);   
+      await addItem(productId, 1);
       toast({
         title: 'Success',
         description: 'Item added to your cart',
@@ -94,7 +95,7 @@ export function WelcomePage() {
 
   // Get the active gradient preset for dynamic styling
   const gradientPreset = getActiveGradientPreset();
-  
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header with gradient background */}
@@ -114,7 +115,7 @@ export function WelcomePage() {
                 </Link>
               </Button>
               <MiniCart />
-              
+
               {!isAuthenticated ? (
                 <>
                   <Button variant="ghost" asChild className="text-white hover:bg-white/20">
@@ -148,8 +149,8 @@ export function WelcomePage() {
                 Discover amazing destinations and book your perfect stay with our curated selection of accommodations worldwide.
               </p>
               <div className="mt-8 w-full max-w-lg mx-auto flex flex-col sm:flex-row sm:justify-center sm:space-x-4 space-y-4 sm:space-y-0 md:mt-12">
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className={`relative z-10 bg-gradient-to-r ${gradientPreset.primaryButtonGradient} text-white shadow-lg text-lg px-8 py-6 h-auto flex items-center justify-center min-w-[200px] transform transition-transform hover:-translate-y-1`}
                   asChild
                 >
@@ -158,9 +159,9 @@ export function WelcomePage() {
                     Explore Now
                   </a>
                 </Button>
-                
+
                 <Button
-                  size="lg" 
+                  size="lg"
                   className={`relative z-10 bg-gradient-to-r ${gradientPreset.secondaryButtonGradient} text-white border-white/20 hover:border-white/40 text-lg px-8 py-6 h-auto flex items-center justify-center min-w-[200px] transform transition-transform hover:-translate-y-1`}
                   asChild
                 >
@@ -173,13 +174,13 @@ export function WelcomePage() {
 
               {/* Travel Categories Section - Blue-Indigo Gradient Design */}
               <div className="mt-16 mb-20 grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-5xl mx-auto relative z-30">
-                {[{ name: 'Hotels', icon: '🏨', shade: 'from-blue-500 to-indigo-600' }, 
-                  { name: 'Flights', icon: '✈️', shade: 'from-blue-600 to-indigo-700' },
-                  { name: 'Activities', icon: '🏄‍♂️', shade: 'from-blue-700 to-indigo-800' },
-                  { name: 'Packages', icon: '🎁', shade: 'from-blue-800 to-indigo-900' }].map((category) => (
-                  <a 
-                    href="/shop" 
-                    key={category.name} 
+                {[{ name: 'Hotels', icon: '🏨', shade: 'from-blue-500 to-indigo-600' },
+                { name: 'Flights', icon: '✈️', shade: 'from-blue-600 to-indigo-700' },
+                { name: 'Activities', icon: '🏄‍♂️', shade: 'from-blue-700 to-indigo-800' },
+                { name: 'Packages', icon: '🎁', shade: 'from-blue-800 to-indigo-900' }].map((category) => (
+                  <a
+                    href="/shop"
+                    key={category.name}
                     className="group block relative overflow-hidden"
                   >
                     <div className={`flex flex-col items-center justify-center p-6 rounded-2xl transition-all transform hover:-translate-y-1 hover:shadow-xl h-full shadow-lg bg-gradient-to-br ${category.shade} border border-blue-300/20`}>
@@ -243,8 +244,8 @@ export function WelcomePage() {
             ) : error ? (
               <div className="text-center py-12">
                 <p className="text-red-500">{error}</p>
-                <Button 
-                  onClick={() => window.location.reload()} 
+                <Button
+                  onClick={() => window.location.reload()}
                   className="mt-4"
                   variant="outline"
                 >
@@ -268,19 +269,19 @@ export function WelcomePage() {
                       />
                       {/* Gradient Overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
-                      
+
                       {/* Type Badge */}
                       <div className="absolute top-3 left-3 z-10">
                         <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full
-                          ${product.type === 'hotel' ? 'bg-blue-500 text-white' : 
-                          product.type === 'flight' ? 'bg-purple-500 text-white' : 
-                          product.type === 'sport' ? 'bg-green-500 text-white' : 
-                          product.type === 'entertainment' ? 'bg-pink-500 text-white' : 
-                          'bg-gray-500 text-white'}`}>
+                          ${product.type === 'hotel' ? 'bg-blue-500 text-white' :
+                            product.type === 'flight' ? 'bg-purple-500 text-white' :
+                              product.type === 'sport' ? 'bg-green-500 text-white' :
+                                product.type === 'entertainment' ? 'bg-pink-500 text-white' :
+                                  'bg-gray-500 text-white'}`}>
                           {product.type.charAt(0).toUpperCase() + product.type.slice(1)}
                         </span>
                       </div>
-                      
+
                       {/* Rating Badge */}
                       {(product.rating !== undefined && product.rating > 0) && (
                         <div className="absolute top-3 right-3 flex items-center bg-yellow-400 text-gray-900 px-2 py-1 rounded-full shadow-md">
@@ -290,7 +291,7 @@ export function WelcomePage() {
                           </svg>
                         </div>
                       )}
-                      
+
                       {/* Location */}
                       <div className="absolute bottom-3 left-3 text-white flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -300,7 +301,7 @@ export function WelcomePage() {
                         <span className="text-sm font-medium truncate max-w-[150px]">{product.location}</span>
                       </div>
                     </div>
-                    
+
                     {/* Product Content */}
                     <div className="flex flex-col flex-grow p-5">
                       {/* Product Title */}
@@ -309,12 +310,12 @@ export function WelcomePage() {
                           {product.name}
                         </CardTitle>
                       </div>
-                      
+
                       {/* Product Description */}
                       <CardDescription className="line-clamp-2 mb-4 flex-grow text-sm">
                         {product.description || 'No description available.'}
                       </CardDescription>
-                      
+
                       {/* Price and Actions */}
                       <div className="mt-auto pt-4 border-t border-gray-100">
                         {/* Price */}
@@ -327,7 +328,7 @@ export function WelcomePage() {
                               {product.type === 'hotel' ? '/ night' : product.type === 'flight' ? '/ person' : ''}
                             </span>
                           </div>
-                          
+
                           {/* Random discount badge (30% chance) */}
                           {Math.random() > 0.7 && (
                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
@@ -336,12 +337,12 @@ export function WelcomePage() {
                             </span>
                           )}
                         </div>
-                        
+
                         {/* Action Buttons */}
                         <div className="flex gap-2 justify-between">
                           {/* Add to Cart Button */}
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             className="flex-1 border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 relative z-20"
                             onClick={(e) => {
@@ -359,16 +360,16 @@ export function WelcomePage() {
                               </>
                             )}
                           </Button>
-                          
+
                           {/* View Details Button */}
-                          <Button 
+                          <Button
                             size="sm"
                             className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 relative z-20 flex items-center justify-center"
                             asChild
                           >
-                            <a 
+                            <a
                               href={`/products/${product.id}`}
-                              className="whitespace-nowrap flex items-center justify-center w-full h-full " style={{padding: '0.5rem'}}
+                              className="whitespace-nowrap flex items-center justify-center w-full h-full " style={{ padding: '0.5rem' }}
                             >
                               <Eye className="w-4 h-4 mr-1" />
                               View Details

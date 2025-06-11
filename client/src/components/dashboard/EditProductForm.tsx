@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from '@/components/ui/select';
-import { 
+import {
   Form,
   FormControl,
   FormDescription,
@@ -31,18 +31,19 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { useToast } from '@/components/ui/use-toast';
-import { 
-  Hotel, 
-  Plane, 
-  Package, 
-  Ticket, 
-  Activity, 
-  MapPin, 
+import {
+  Hotel,
+  Plane,
+  Package,
+  Ticket,
+  Activity,
+  MapPin,
   ArrowLeft,
   Check,
   Loader2,
   DollarSign
 } from 'lucide-react';
+import { getProductById } from '@/services/productService';
 
 // Form schema validation
 const productFormSchema = z.object({
@@ -66,46 +67,6 @@ const productFormSchema = z.object({
 
 type FormData = z.infer<typeof productFormSchema>;
 
-// Mock product data - in a real app, this would come from an API
-const mockProducts = [
-  {
-    id: 1,
-    name: 'Luxury Beach Resort',
-    type: 'hotel',
-    description: '5-star luxury resort with private beach access',
-    price: 249.99,
-    original_price: 349.99,
-    sale_price: 249.99,
-    location: 'Maldives',
-    is_active: true,
-    created_at: '2025-01-15T08:00:00.000Z'
-  },
-  {
-    id: 2,
-    name: 'Business Class Flight to Paris',
-    type: 'flight',
-    description: 'Round-trip business class flight to Paris',
-    price: 999.99,
-    original_price: 1299.99,
-    sale_price: 999.99,
-    location: 'Dubai',
-    is_active: true,
-    created_at: '2025-02-10T10:30:00.000Z'
-  },
-  {
-    id: 3,
-    name: 'Champions League Final',
-    type: 'sport',
-    description: 'Football match ticket for the UEFA Champions League Final',
-    price: 349.99,
-    original_price: 399.99,
-    sale_price: 349.99,
-    location: 'London',
-    is_active: true,
-    created_at: '2025-03-05T14:15:00.000Z'
-  }
-];
-
 export function EditProductForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -113,20 +74,15 @@ export function EditProductForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [product, setProduct] = useState<any>(null);
-  
+
   // Fetch product data
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setIsLoading(true);
-        
-        // In a real app, this would be an API call
-        // const response = await axios.get(`/api/products/${id}`);
-        // const productData = response.data;
-        
-        // For this example, we'll use mock data
-        const productData = mockProducts.find(p => p.id === Number(id));
-        
+
+        const productData = await getProductById(id);
+
         if (!productData) {
           toast({
             title: "Error",
@@ -136,9 +92,9 @@ export function EditProductForm() {
           navigate('/dashboard/products-enhanced');
           return;
         }
-        
+
         setProduct(productData);
-        
+
         // Initialize form with product data
         form.reset({
           name: productData.name,
@@ -150,7 +106,7 @@ export function EditProductForm() {
           location: productData.location,
           is_active: productData.is_active,
         });
-        
+
         setIsLoading(false);
       } catch (error) {
         console.error('Error fetching product:', error);
@@ -162,10 +118,10 @@ export function EditProductForm() {
         navigate('/dashboard/products-enhanced');
       }
     };
-    
+
     fetchProduct();
   }, [id, navigate, toast]);
-  
+
   type ProductFormValues = z.infer<typeof productFormSchema>;
 
   // Initialize form with validation
@@ -187,33 +143,33 @@ export function EditProductForm() {
   async function onSubmit(values: z.infer<typeof productFormSchema>) {
     try {
       setIsSubmitting(true);
-      
+
       // Ensure price is set to the sale price for backward compatibility
       const submissionData = {
         ...values,
         price: values.sale_price // Set price to match sale_price for backward compatibility
       };
-      
+
       // Calculate discount percentage for display
-      const discountPercentage = values.original_price > 0 
-        ? Math.round((1 - (values.sale_price / values.original_price)) * 100) 
+      const discountPercentage = values.original_price > 0
+        ? Math.round((1 - (values.sale_price / values.original_price)) * 100)
         : 0;
-      
+
       // Simulate API call with a delay
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       // In a real app, this would be an API call
       // await axios.put(`/api/products/${id}`, submissionData);
-      
+
       console.log('Product updated:', submissionData);
       console.log(`Discount applied: ${discountPercentage}%`);
-      
+
       toast({
         title: "Product Updated",
         description: `Your product has been successfully updated${discountPercentage > 0 ? ` with a ${discountPercentage}% discount` : ''}.`,
         variant: "default",
       });
-      
+
       // Navigate back to products list
       navigate('/dashboard/products-enhanced');
     } catch (error) {
@@ -259,8 +215,8 @@ export function EditProductForm() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Edit Product</h2>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={() => navigate('/dashboard/products-enhanced')}
           className="flex items-center gap-1"
         >
@@ -268,7 +224,7 @@ export function EditProductForm() {
           Back to Products
         </Button>
       </div>
-      
+
       <Card className="border-none shadow-md overflow-hidden bg-white dark:bg-gray-800">
         <CardHeader className="border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
           <CardTitle className="text-xl">Product Information</CardTitle>
@@ -291,7 +247,7 @@ export function EditProductForm() {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="type"
@@ -317,7 +273,7 @@ export function EditProductForm() {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="original_price"
@@ -327,12 +283,12 @@ export function EditProductForm() {
                       <FormControl>
                         <div className="relative">
                           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                          <Input 
-                            type="number" 
-                            min="0" 
-                            step="0.01" 
-                            className="pl-8" 
-                            {...field} 
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            className="pl-8"
+                            {...field}
                             onChange={(e) => {
                               field.onChange(e);
                               // Auto-update sale price if it's empty or higher than original price
@@ -352,7 +308,7 @@ export function EditProductForm() {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="sale_price"
@@ -362,12 +318,12 @@ export function EditProductForm() {
                       <FormControl>
                         <div className="relative">
                           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                          <Input 
-                            type="number" 
-                            min="0" 
-                            step="0.01" 
-                            className="pl-8" 
-                            {...field} 
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            className="pl-8"
+                            {...field}
                           />
                         </div>
                       </FormControl>
@@ -378,7 +334,7 @@ export function EditProductForm() {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="location"
@@ -395,7 +351,7 @@ export function EditProductForm() {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="description"
@@ -403,17 +359,17 @@ export function EditProductForm() {
                     <FormItem className="md:col-span-2">
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          placeholder="Enter product description" 
-                          className="h-32 resize-none" 
-                          {...field} 
+                        <Textarea
+                          placeholder="Enter product description"
+                          className="h-32 resize-none"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="is_active"
@@ -439,7 +395,7 @@ export function EditProductForm() {
                   )}
                 />
               </div>
-              
+
               <div className="flex justify-end gap-3">
                 <Button
                   type="button"
@@ -448,8 +404,8 @@ export function EditProductForm() {
                 >
                   Cancel
                 </Button>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={isSubmitting}
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white"
                 >

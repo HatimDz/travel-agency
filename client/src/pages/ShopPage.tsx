@@ -7,26 +7,26 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/components/ui/use-toast';
-import { 
-  Filter, 
-  Search, 
-  ShoppingCart, 
-  Star, 
-  SlidersHorizontal, 
-  X, 
-  ChevronDown, 
-  Eye, 
+import {
+  Filter,
+  Search,
+  ShoppingCart,
+  Star,
+  SlidersHorizontal,
+  X,
+  ChevronDown,
+  Eye,
   Tag,
   HeartIcon,
   BadgePercent
 } from 'lucide-react';
-import { 
+import {
   Slider,
   SliderTrack,
   SliderRange,
   SliderThumb,
 } from '@/components/ui/slider';
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -62,8 +62,8 @@ export function ShopPage() {
   const [showFilters, setShowFilters] = useState(true);
   const { toast } = useToast();
   const { addItem } = useCart();
-  const [addingToCart, setAddingToCart] = useState<{[key: string]: boolean}>({});
-  
+  const [addingToCart, setAddingToCart] = useState<{ [key: string]: boolean }>({});
+
   // Define our filter state
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 10000],
@@ -89,8 +89,14 @@ export function ShopPage() {
       try {
         setIsLoading(true);
         setError(null);
-        const data = await getProducts();
-        
+
+        const response = await getProducts({ isActive: true });
+        const data = Array.isArray(response) ? response : response.data;
+
+        if (!Array.isArray(data)) {
+          throw new Error("API response is not an array.");
+        }
+
         // Transform and normalize the data
         const formattedProducts = data.map(product => {
           // Use type assertion to handle API response having different property names
@@ -106,7 +112,7 @@ export function ShopPage() {
             originalPrice: product.price,
           };
         });
-        
+
         setProducts(formattedProducts);
         setFilteredProducts(formattedProducts);
       } catch (err: any) {
@@ -129,42 +135,42 @@ export function ShopPage() {
   useEffect(() => {
     const applyFilters = () => {
       let result = [...products];
-      
+
       // Filter by price range
       result = result.filter(
         product => product.price >= filters.priceRange[0] && product.price <= filters.priceRange[1]
       );
-      
+
       // Filter by categories
       if (filters.categories.length > 0) {
         result = result.filter(product => filters.categories.includes(product.type));
       }
-      
+
       // Filter by rating
       if (filters.rating !== null) {
-        result = result.filter(product => 
+        result = result.filter(product =>
           product.rating !== undefined && product.rating >= filters.rating!
         );
       }
-      
+
       // Filter by search query
       if (filters.searchQuery) {
         const query = filters.searchQuery.toLowerCase();
         result = result.filter(
-          product => 
-            product.name.toLowerCase().includes(query) || 
+          product =>
+            product.name.toLowerCase().includes(query) ||
             product.description.toLowerCase().includes(query) ||
             product.location.toLowerCase().includes(query)
         );
       }
-      
+
       // Filter only discounted items
       if (filters.onlyDiscounted) {
-        result = result.filter(product => 
+        result = result.filter(product =>
           (product as any).discountPercentage > 0
         );
       }
-      
+
       // Sort products
       switch (filters.sortBy) {
         case 'price-low':
@@ -175,7 +181,7 @@ export function ShopPage() {
           break;
         case 'newest':
           // Assuming we have a createdAt field
-          result.sort((a, b) => 
+          result.sort((a, b) =>
             (new Date(b.createdAt || 0)).getTime() - (new Date(a.createdAt || 0)).getTime()
           );
           break;
@@ -185,10 +191,10 @@ export function ShopPage() {
           result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
           break;
       }
-      
+
       setFilteredProducts(result);
     };
-    
+
     applyFilters();
   }, [filters, products]);
 
@@ -233,9 +239,8 @@ export function ShopPage() {
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
-            className={`w-4 h-4 ${
-              star <= Math.round(rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'
-            }`}
+            className={`w-4 h-4 ${star <= Math.round(rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'
+              }`}
           />
         ))}
       </div>
@@ -279,7 +284,7 @@ export function ShopPage() {
           </div>
         </div>
       </header>
-      
+
       {/* Hero Section */}
       <div className="relative bg-gradient-to-b from-indigo-600 to-indigo-900 text-white overflow-hidden">
         <div className="absolute inset-0 z-0 opacity-20">
@@ -293,7 +298,7 @@ export function ShopPage() {
             <p className="text-xl max-w-3xl mx-auto text-indigo-100 mb-8">Explore our curated selection of hotels, flights, and vacation packages designed for unforgettable experiences.</p>
             <div className="flex flex-wrap justify-center gap-4 max-w-2xl mx-auto mb-6">
               {categories.map((category) => (
-                <Button 
+                <Button
                   key={category.id}
                   variant="secondary"
                   className={`bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 ${filters.categories.includes(category.id) ? 'bg-white/30 ring-2 ring-white' : ''}`}
@@ -347,9 +352,9 @@ export function ShopPage() {
                   <Filter className="w-5 h-5 mr-2 text-indigo-600" />
                   Refine Results
                 </h2>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   className="md:hidden text-indigo-600 hover:bg-indigo-50"
                   onClick={() => setShowFilters(false)}
                 >
@@ -399,7 +404,7 @@ export function ShopPage() {
                   <AccordionContent>
                     <div className="grid grid-cols-2 gap-3 py-2">
                       {categories.map((category) => (
-                        <div 
+                        <div
                           key={category.id}
                           className={`flex items-center p-2 rounded-lg cursor-pointer transition-all duration-200 ${filters.categories.includes(category.id) ? 'bg-indigo-100 text-indigo-800' : 'hover:bg-gray-50'}`}
                           onClick={() => {
@@ -416,12 +421,12 @@ export function ShopPage() {
                             }
                           }}
                         >
-                          <Checkbox 
-                            id={`category-${category.id}`} 
+                          <Checkbox
+                            id={`category-${category.id}`}
                             checked={filters.categories.includes(category.id)}
                             className="data-[state=checked]:bg-indigo-600 data-[state=checked]:text-primary-foreground"
                           />
-                          <label 
+                          <label
                             htmlFor={`category-${category.id}`}
                             className="text-sm ml-2 font-medium cursor-pointer select-none"
                           >
@@ -444,8 +449,8 @@ export function ShopPage() {
                   <AccordionContent>
                     <div className="space-y-3 py-2">
                       {[5, 4, 3, 2, 1].map((star) => (
-                        <div 
-                          className={`flex items-center p-2 rounded-lg cursor-pointer transition-all duration-200 ${filters.rating === star ? 'bg-amber-50 text-amber-800' : 'hover:bg-gray-50'}`} 
+                        <div
+                          className={`flex items-center p-2 rounded-lg cursor-pointer transition-all duration-200 ${filters.rating === star ? 'bg-amber-50 text-amber-800' : 'hover:bg-gray-50'}`}
                           key={star}
                           onClick={() => {
                             setFilters({
@@ -454,12 +459,12 @@ export function ShopPage() {
                             });
                           }}
                         >
-                          <Checkbox 
-                            id={`rating-${star}`} 
+                          <Checkbox
+                            id={`rating-${star}`}
                             checked={filters.rating === star}
                             className="data-[state=checked]:bg-amber-500 data-[state=checked]:text-primary-foreground"
                           />
-                          <label 
+                          <label
                             htmlFor={`rating-${star}`}
                             className="text-sm ml-2 font-medium cursor-pointer select-none flex items-center"
                           >
@@ -488,7 +493,7 @@ export function ShopPage() {
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <div 
+                    <div
                       className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-200 ${filters.onlyDiscounted ? 'bg-rose-50 text-rose-800' : 'hover:bg-gray-50'}`}
                       onClick={() => {
                         setFilters({
@@ -497,12 +502,12 @@ export function ShopPage() {
                         });
                       }}
                     >
-                      <Checkbox 
-                        id="discounted-only" 
+                      <Checkbox
+                        id="discounted-only"
                         checked={filters.onlyDiscounted}
                         className="data-[state=checked]:bg-rose-600 data-[state=checked]:text-primary-foreground"
                       />
-                      <label 
+                      <label
                         htmlFor="discounted-only"
                         className="text-sm ml-2 font-medium cursor-pointer select-none flex items-center"
                       >
@@ -515,8 +520,8 @@ export function ShopPage() {
               </Accordion>
 
               <div className="mt-6 pt-4 border-t border-indigo-100">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full bg-white border-indigo-200 text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800 transition-all duration-200 font-medium"
                   onClick={() => {
                     setFilters({
@@ -540,9 +545,9 @@ export function ShopPage() {
           <div className="flex-1">
             {/* Toolbar */}
             <div className="bg-white p-4 rounded-lg shadow-sm border mb-4 flex flex-wrap items-center justify-between gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 className="md:hidden"
                 onClick={() => setShowFilters(true)}
               >
@@ -555,15 +560,15 @@ export function ShopPage() {
                   {filteredProducts.length} products
                 </span>
               </div>
-              
+
               <div className="flex items-center">
                 <span className="text-sm text-gray-500 mr-2">Sort by:</span>
                 <Select
                   value={filters.sortBy}
-                  onValueChange={(value) => 
-                    setFilters({ 
-                      ...filters, 
-                      sortBy: value as 'popularity' | 'price-low' | 'price-high' | 'newest' 
+                  onValueChange={(value) =>
+                    setFilters({
+                      ...filters,
+                      sortBy: value as 'popularity' | 'price-low' | 'price-high' | 'newest'
                     })
                   }
                 >
@@ -581,60 +586,60 @@ export function ShopPage() {
             </div>
 
             {/* Active Filters */}
-            {(filters.categories.length > 0 || filters.rating !== null || 
-              filters.onlyDiscounted || 
+            {(filters.categories.length > 0 || filters.rating !== null ||
+              filters.onlyDiscounted ||
               (filters.priceRange[0] > 0 || filters.priceRange[1] < 10000)) && (
-              <div className="bg-white p-4 rounded-lg shadow-sm border mb-4">
-                <div className="flex flex-wrap gap-2 items-center">
-                  <span className="text-sm text-gray-500">Active filters:</span>
-                  
-                  {filters.categories.length > 0 && (
-                    filters.categories.map(category => (
-                      <Badge key={category} variant="outline" className="flex items-center gap-1">
-                        {categories.find(c => c.id === category)?.name}
-                        <X 
-                          className="w-3 h-3 cursor-pointer" 
-                          onClick={() => setFilters({
-                            ...filters,
-                            categories: filters.categories.filter(c => c !== category)
-                          })}
+                <div className="bg-white p-4 rounded-lg shadow-sm border mb-4">
+                  <div className="flex flex-wrap gap-2 items-center">
+                    <span className="text-sm text-gray-500">Active filters:</span>
+
+                    {filters.categories.length > 0 && (
+                      filters.categories.map(category => (
+                        <Badge key={category} variant="outline" className="flex items-center gap-1">
+                          {categories.find(c => c.id === category)?.name}
+                          <X
+                            className="w-3 h-3 cursor-pointer"
+                            onClick={() => setFilters({
+                              ...filters,
+                              categories: filters.categories.filter(c => c !== category)
+                            })}
+                          />
+                        </Badge>
+                      ))
+                    )}
+
+                    {filters.rating !== null && (
+                      <Badge variant="outline" className="flex items-center gap-1">
+                        {filters.rating}+ Stars
+                        <X
+                          className="w-3 h-3 cursor-pointer"
+                          onClick={() => setFilters({ ...filters, rating: null })}
                         />
                       </Badge>
-                    ))
-                  )}
-                  
-                  {filters.rating !== null && (
-                    <Badge variant="outline" className="flex items-center gap-1">
-                      {filters.rating}+ Stars
-                      <X 
-                        className="w-3 h-3 cursor-pointer" 
-                        onClick={() => setFilters({ ...filters, rating: null })}
-                      />
-                    </Badge>
-                  )}
-                  
-                  {(filters.priceRange[0] > 0 || filters.priceRange[1] < 10000) && (
-                    <Badge variant="outline" className="flex items-center gap-1">
-                      ${filters.priceRange[0]} - ${filters.priceRange[1]}
-                      <X 
-                        className="w-3 h-3 cursor-pointer" 
-                        onClick={() => setFilters({ ...filters, priceRange: [0, 10000] })}
-                      />
-                    </Badge>
-                  )}
-                  
-                  {filters.onlyDiscounted && (
-                    <Badge variant="outline" className="flex items-center gap-1 bg-red-50">
-                      On Sale
-                      <X 
-                        className="w-3 h-3 cursor-pointer" 
-                        onClick={() => setFilters({ ...filters, onlyDiscounted: false })}
-                      />
-                    </Badge>
-                  )}
+                    )}
+
+                    {(filters.priceRange[0] > 0 || filters.priceRange[1] < 10000) && (
+                      <Badge variant="outline" className="flex items-center gap-1">
+                        ${filters.priceRange[0]} - ${filters.priceRange[1]}
+                        <X
+                          className="w-3 h-3 cursor-pointer"
+                          onClick={() => setFilters({ ...filters, priceRange: [0, 10000] })}
+                        />
+                      </Badge>
+                    )}
+
+                    {filters.onlyDiscounted && (
+                      <Badge variant="outline" className="flex items-center gap-1 bg-red-50">
+                        On Sale
+                        <X
+                          className="w-3 h-3 cursor-pointer"
+                          onClick={() => setFilters({ ...filters, onlyDiscounted: false })}
+                        />
+                      </Badge>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {/* Products Grid */}
             {isLoading ? (
@@ -671,8 +676,8 @@ export function ShopPage() {
             ) : error ? (
               <div className="text-center py-12 bg-white rounded-lg shadow-sm border">
                 <p className="text-red-500">{error}</p>
-                <Button 
-                  onClick={() => window.location.reload()} 
+                <Button
+                  onClick={() => window.location.reload()}
                   className="mt-4"
                   variant="outline"
                 >
@@ -684,10 +689,10 @@ export function ShopPage() {
                 {filteredProducts.map((product) => {
                   const discountPercentage = (product as any).discountPercentage || 0;
                   const hasDiscount = discountPercentage > 0;
-                  const discountedPrice = hasDiscount 
-                    ? product.price * (1 - discountPercentage / 100) 
+                  const discountedPrice = hasDiscount
+                    ? product.price * (1 - discountPercentage / 100)
                     : product.price;
-                    
+
                   return (
                     <Card key={product.id} className="overflow-hidden group hover:shadow-xl transition-all duration-300 h-full flex flex-col border-0 shadow-md rounded-xl">
                       {/* Product Image with Discount Badge */}
@@ -702,14 +707,14 @@ export function ShopPage() {
                             target.src = getDefaultImageByType(product.type);
                           }}
                         />
-                        
+
                         {/* Category Badge */}
                         <div className="absolute top-3 left-3 z-20">
                           <Badge className="bg-white/90 text-indigo-600 hover:bg-white font-medium shadow-sm">
                             {product.type.charAt(0).toUpperCase() + product.type.slice(1)}
                           </Badge>
                         </div>
-                        
+
                         {/* Discount Badge */}
                         {hasDiscount && (
                           <div className="absolute top-3 right-3 z-20">
@@ -718,11 +723,11 @@ export function ShopPage() {
                             </Badge>
                           </div>
                         )}
-                        
+
                         {/* Quick Action Buttons (visible on hover) */}
                         <div className="absolute bottom-3 right-3 left-3 z-20 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <Button 
-                            variant="secondary" 
+                          <Button
+                            variant="secondary"
                             size="sm"
                             className="bg-white/90 hover:bg-white text-indigo-600 rounded-full w-10 h-10 p-0 mr-2"
                             onClick={(e) => {
@@ -738,8 +743,8 @@ export function ShopPage() {
                               <ShoppingCart className="w-5 h-5" />
                             )}
                           </Button>
-                          <Button 
-                            asChild 
+                          <Button
+                            asChild
                             variant="secondary"
                             size="sm"
                             className="bg-white/90 hover:bg-white text-indigo-600 rounded-full w-10 h-10 p-0"
@@ -750,7 +755,7 @@ export function ShopPage() {
                           </Button>
                         </div>
                       </div>
-                      
+
                       <div className="flex flex-col flex-grow p-5">
                         {/* Title and Location */}
                         <div>
@@ -763,7 +768,7 @@ export function ShopPage() {
                             {product.location}
                           </p>
                         </div>
-                        
+
                         {/* Rating */}
                         <div className="mt-3 flex items-center">
                           <div className="flex text-amber-400">
@@ -776,12 +781,12 @@ export function ShopPage() {
                           </div>
                           <span className="ml-2 text-xs text-gray-500">{product.rating?.toFixed(1) || '0.0'}/5.0</span>
                         </div>
-                        
+
                         {/* Description */}
                         <CardDescription className="line-clamp-2 mt-3 text-gray-600 flex-grow">
                           {product.description || 'No description available.'}
                         </CardDescription>
-                        
+
                         {/* Price */}
                         <div className="mt-4 mb-3">
                           {hasDiscount ? (
@@ -790,19 +795,19 @@ export function ShopPage() {
                                 ${discountedPrice.toFixed(2)}
                               </span>
                               <span className="text-sm text-gray-500 line-through ml-2">
-                                ${product.price.toFixed(2)}
+                                ${product.price}
                               </span>
                             </div>
                           ) : (
                             <span className="text-xl font-bold text-indigo-600">
-                              ${product.price.toFixed(2)}
+                              ${product.price}
                             </span>
                           )}
                         </div>
-                        
+
                         {/* Actions */}
                         <div className="flex gap-2 mt-auto pt-3 border-t border-gray-100">
-                          <Button 
+                          <Button
                             className="flex-1 bg-indigo-600 hover:bg-indigo-700"
                             size="sm"
                             onClick={(e) => {
@@ -821,9 +826,9 @@ export function ShopPage() {
                               </>
                             )}
                           </Button>
-                          <Button 
-                            asChild 
-                            variant="outline" 
+                          <Button
+                            asChild
+                            variant="outline"
                             size="sm"
                             className="flex-[0.4] border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700"
                           >
@@ -845,7 +850,7 @@ export function ShopPage() {
                   </svg>
                   <h3 className="text-xl font-bold text-indigo-900 mb-2">No Results Found</h3>
                   <p className="text-gray-500 mb-6">We couldn't find any products that match your current filters. Try adjusting your search criteria.</p>
-                  <Button 
+                  <Button
                     onClick={() => {
                       setFilters({
                         priceRange: [0, 10000],
@@ -855,7 +860,7 @@ export function ShopPage() {
                         sortBy: 'popularity',
                         onlyDiscounted: false
                       });
-                    }} 
+                    }}
                     className="bg-indigo-600 hover:bg-indigo-700 text-white"
                   >
                     <X className="w-4 h-4 mr-2" />
@@ -864,7 +869,7 @@ export function ShopPage() {
                 </div>
               </div>
             )}
-            
+
             {/* Results Count */}
             {filteredProducts.length > 0 && (
               <div className="mt-8 text-center">

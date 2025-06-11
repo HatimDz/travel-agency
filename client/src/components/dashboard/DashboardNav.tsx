@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -34,6 +34,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/hooks/useAuth';
+import { getProducts } from '@/services/productService';
 
 interface NavItem {
   title: string;
@@ -60,6 +61,22 @@ export function DashboardNav() {
 
   // Check if user is a sub-super admin
   const isSubSuperAdmin = user?.role === 'SubSuperAdmin';
+
+   // State to hold products count for badge
+  const [productsCount, setProductsCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await getProducts();
+        setProductsCount(response.total); // <-- update count here
+      } catch (error) {
+        console.error('Failed to fetch products count', error);
+      }
+    };
+
+    fetchProducts();
+  }, []); // run once on mount
 
   // Define navigation items grouped by sections
   const mainNav: NavGroup[] = [
@@ -97,7 +114,7 @@ export function DashboardNav() {
           title: 'Products',
           href: '/dashboard/products-enhanced',
           icon: <ShoppingBag className="h-5 w-5" />,
-          badge: '156',
+          badge: productsCount !== null ? productsCount.toString() : '...', // show loading state if count null
           badgeColor: 'default'
         },
         {

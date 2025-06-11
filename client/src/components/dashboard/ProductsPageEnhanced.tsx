@@ -61,6 +61,7 @@ import {
 import { useToast } from '@/components/ui/use-toast';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
+import { getProducts } from '@/services/productService';
 
 // Type definition for products
 interface Product {
@@ -238,11 +239,9 @@ export function ProductsPageEnhanced() {
         // Simulate API call with delay
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // In a real app, this would be an API call like:
-        // const response = await axios.get('/api/products');
-        // setProducts(response.data);
-        
-        setProducts(mockProducts);
+        const response = await getProducts();
+        setProducts(response.data);
+
       } catch (error) {
         console.error('Error fetching products:', error);
         toast({
