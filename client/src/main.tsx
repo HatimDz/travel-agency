@@ -20,7 +20,8 @@ function Root() {
             <ToastProvider>
               <AuthProvider>
                 <App />
-                <Toaster />
+                {/* il faut trouver une solution à Toast */}
+                {/* <Toaster /> */}
               </AuthProvider>
             </ToastProvider>
           </ThemeProvider>

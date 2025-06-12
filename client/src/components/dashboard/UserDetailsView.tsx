@@ -186,7 +186,7 @@ export function UserDetailsView() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-500 dark:text-gray-400">Role</p>
-                      <p className="font-medium text-gray-900 dark:text-gray-100">{user.role || 'Customer'}</p>
+                      <p className="font-medium text-gray-900 dark:text-gray-100">{user.roles[0].name || 'Customer'}</p>
                     </div>
                   </div>
                   

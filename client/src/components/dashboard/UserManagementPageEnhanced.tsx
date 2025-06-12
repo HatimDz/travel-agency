@@ -54,13 +54,13 @@ import { useToast } from '@/components/ui/use-toast';
 import { UserRole, User } from '@/types/user';
 import useUsers from '@/hooks/useUsers';
 import { CreateUserData } from '@/services/userService';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
 
 export function UserManagementPageEnhanced() {
@@ -106,21 +106,21 @@ export function UserManagementPageEnhanced() {
 
   // Filter users based on search term and filters
   const filteredUsers = users.filter(user => {
-    const matchesSearch = 
-      user.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchesSearch =
+      user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesRole = filterRole === 'all' || user.role === filterRole;
     const matchesStatus = true; // We'll implement status filtering when the API provides this field
-    
+
     return matchesSearch && matchesRole && matchesStatus;
   });
 
   // Handle user selection
   const toggleUserSelection = (userId: string) => {
-    setSelectedUsers(prev => 
-      prev.includes(userId) 
-        ? prev.filter(id => id !== userId) 
+    setSelectedUsers(prev =>
+      prev.includes(userId)
+        ? prev.filter(id => id !== userId)
         : [...prev, userId]
     );
   };
@@ -137,7 +137,7 @@ export function UserManagementPageEnhanced() {
   const handleCreateUser = async () => {
     try {
       setIsSubmitting(true);
-      
+
       // Prepare the user data
       const userData: CreateUserData = {
         name: newUserData.name,
@@ -146,10 +146,10 @@ export function UserManagementPageEnhanced() {
         password_confirmation: newUserData.password_confirmation,
         role: newUserData.role
       };
-      
+
       // Create the user
       const newUser = await addUser(userData);
-      
+
       // Reset form and close dialog
       setIsNewUserDialogOpen(false);
       setNewUserData({
@@ -159,7 +159,7 @@ export function UserManagementPageEnhanced() {
         password_confirmation: '',
         role: 'Customer' as UserRole
       });
-      
+
       toast({
         title: "User created",
         description: `${newUser.name} has been added successfully.`,
@@ -181,7 +181,7 @@ export function UserManagementPageEnhanced() {
     try {
       await removeUser(userId);
       setSelectedUsers(prev => prev.filter(id => id !== userId));
-      
+
       toast({
         title: "User deleted",
         description: "The user has been removed from the system.",
@@ -203,12 +203,12 @@ export function UserManagementPageEnhanced() {
         // Delete multiple users one by one
         const promises = selectedUsers.map(id => removeUser(id));
         await Promise.all(promises);
-        
+
         toast({
           title: "Users deleted",
           description: `${selectedUsers.length} users have been removed from the system.`,
         });
-        
+
         setSelectedUsers([]);
       } catch (error) {
         console.error('Error performing bulk delete:', error);
@@ -223,7 +223,7 @@ export function UserManagementPageEnhanced() {
         // Toggle status for multiple users
         const promises = selectedUsers.map(id => toggleStatus(id));
         await Promise.all(promises);
-        
+
         toast({
           title: `Users ${action}d`,
           description: `${selectedUsers.length} users have been ${action}d.`,
@@ -281,7 +281,7 @@ export function UserManagementPageEnhanced() {
           <CardTitle>Users</CardTitle>
           <CardDescription>Manage your system users, assign roles, and control access permissions.</CardDescription>
         </CardHeader>
-        
+
         <CardContent className="p-4 sm:p-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex-1 max-w-md relative">
@@ -293,7 +293,7 @@ export function UserManagementPageEnhanced() {
                 className="pl-9 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700"
               />
             </div>
-            
+
             <div className="flex flex-wrap items-center gap-2">
               <Select value={filterRole} onValueChange={setFilterRole}>
                 <SelectTrigger className="w-[140px] bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700">
@@ -307,14 +307,14 @@ export function UserManagementPageEnhanced() {
                   <SelectItem value="Customer">Customer</SelectItem>
                 </SelectContent>
               </Select>
-              
+
               <Button variant="outline" size="icon" className="border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
                 <Filter className="h-4 w-4 text-gray-500" />
               </Button>
-              
-              <Button 
-                variant="outline" 
-                size="icon" 
+
+              <Button
+                variant="outline"
+                size="icon"
                 className="border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900"
                 onClick={() => fetchUsers()}
               >
@@ -322,7 +322,7 @@ export function UserManagementPageEnhanced() {
               </Button>
             </div>
           </div>
-          
+
           {selectedUsers.length > 0 && (
             <div className="flex items-center gap-2 mt-4 p-2 bg-gray-50 dark:bg-gray-800 rounded-md">
               <span className="text-sm text-gray-500 dark:text-gray-400">{selectedUsers.length} users selected</span>
@@ -353,7 +353,7 @@ export function UserManagementPageEnhanced() {
             </div>
           )}
         </CardContent>
-        
+
         {loading ? (
           <div className="flex justify-center items-center p-8">
             <div className="flex flex-col items-center gap-2">
@@ -367,8 +367,8 @@ export function UserManagementPageEnhanced() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[40px]">
-                    <Checkbox 
-                      checked={selectedUsers.length > 0 && selectedUsers.length === filteredUsers.length} 
+                    <Checkbox
+                      checked={selectedUsers.length > 0 && selectedUsers.length === filteredUsers.length}
                       onCheckedChange={(checked) => selectAllUsers(!!checked)}
                       className="translate-y-[2px]"
                     />
@@ -391,8 +391,8 @@ export function UserManagementPageEnhanced() {
                   filteredUsers.map((user) => (
                     <TableRow key={user.id} className="border-b border-gray-100 dark:border-gray-700">
                       <TableCell>
-                        <Checkbox 
-                          checked={selectedUsers.includes(user.id)} 
+                        <Checkbox
+                          checked={selectedUsers.includes(user.id)}
                           onCheckedChange={() => toggleUserSelection(user.id)}
                           className="translate-y-[2px]"
                         />
@@ -412,7 +412,7 @@ export function UserManagementPageEnhanced() {
                       </TableCell>
                       <TableCell>
                         <Badge className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                          {user.role || 'Customer'}
+                          {user.roles[0].name}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -469,61 +469,63 @@ export function UserManagementPageEnhanced() {
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-1 gap-3">
               <Label htmlFor="name">Full Name</Label>
-              <Input 
-                id="name" 
-                value={newUserData.name} 
-                onChange={(e) => setNewUserData({...newUserData, name: e.target.value})}
+              <Input
+                id="name"
+                value={newUserData.name}
+                onChange={(e) => setNewUserData({ ...newUserData, name: e.target.value })}
                 placeholder="Enter full name"
               />
             </div>
-            
+
             <div className="grid grid-cols-1 gap-3">
               <Label htmlFor="email">Email Address</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                value={newUserData.email} 
-                onChange={(e) => setNewUserData({...newUserData, email: e.target.value})}
+              <Input
+                id="email"
+                type="email"
+                value={newUserData.email}
+                onChange={(e) => setNewUserData({ ...newUserData, email: e.target.value })}
                 placeholder="Enter email address"
               />
             </div>
-            
+
             <div className="grid grid-cols-1 gap-3">
               <Label htmlFor="role">User Role</Label>
-              <Select 
-                value={newUserData.role} 
-                onValueChange={(value) => setNewUserData({...newUserData, role: value as UserRole})}
+              <Select
+                value={newUserData.role}
+                onValueChange={(value) => setNewUserData({ ...newUserData, role: value as UserRole })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Customer">Customer</SelectItem>
-                  <SelectItem value="Seller">Seller</SelectItem>
-                  <SelectItem value="SubSuperAdmin">Sub-Super Admin</SelectItem>
                   <SelectItem value="SuperAdmin">Super Admin</SelectItem>
+                  <SelectItem value="Seller">Seller</SelectItem>
+                  <SelectItem value="Random buyer">Random buyer</SelectItem>
+                  <SelectItem value="Hotel Manager">Hotel Manager</SelectItem>
+                  <SelectItem value="Staff">Staff</SelectItem>
+                  <SelectItem value="Customer">Customer</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="grid grid-cols-1 gap-3">
               <Label htmlFor="password">Password</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                value={newUserData.password} 
-                onChange={(e) => setNewUserData({...newUserData, password: e.target.value})}
+              <Input
+                id="password"
+                type="password"
+                value={newUserData.password}
+                onChange={(e) => setNewUserData({ ...newUserData, password: e.target.value })}
                 placeholder="Enter password"
               />
             </div>
-            
+
             <div className="grid grid-cols-1 gap-3">
               <Label htmlFor="password_confirmation">Confirm Password</Label>
-              <Input 
-                id="password_confirmation" 
-                type="password" 
-                value={newUserData.password_confirmation} 
-                onChange={(e) => setNewUserData({...newUserData, password_confirmation: e.target.value})}
+              <Input
+                id="password_confirmation"
+                type="password"
+                value={newUserData.password_confirmation}
+                onChange={(e) => setNewUserData({ ...newUserData, password_confirmation: e.target.value })}
                 placeholder="Confirm password"
               />
             </div>
@@ -533,8 +535,8 @@ export function UserManagementPageEnhanced() {
             <Button variant="outline" onClick={() => setIsNewUserDialogOpen(false)}>
               Cancel
             </Button>
-            <Button 
-              onClick={handleCreateUser} 
+            <Button
+              onClick={handleCreateUser}
               disabled={isSubmitting || !newUserData.name || !newUserData.email || !newUserData.password || !newUserData.password_confirmation}
               className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
             >

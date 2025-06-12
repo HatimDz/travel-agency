@@ -1960,3 +1960,14 @@
 **Architecture summary**: Laravel backend, modular API structure, feature tests in place. Swagger UI will expose all API endpoints for interactive testing. No UI changes to frontend yet.
 **Model/version**: Laravel, darkaonline/l5-swagger (latest as of 2025-05-24)
 **User-approved logic**: Add Swagger UI for API testing.
+
+## 2025-06-11
+- Get dynamic data in welcome and shop and admin page for products
+- Show dynamic data in edit product
+- Sow the the count of product in the menu
+
+## 2025-06-12
+- Show the correct role in the detail and list of users
+- Toast (alert) not work
+- Create and Edit user work
+- Toast do a lot of problem in the plateform

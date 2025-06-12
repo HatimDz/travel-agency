@@ -35,7 +35,7 @@ export const getUsers = async (): Promise<User[]> => {
 export const getUser = async (id: string): Promise<User> => {
   try {
     const response = await api.get<{ data: User }>(`/users/${id}`);
-    return response.data.data;
+    return response.data;
   } catch (error) {
     console.error('Error fetching user:', error);
     // Fallback to mock data for demo purposes
@@ -89,12 +89,12 @@ export const getUser = async (id: string): Promise<User> => {
 
 export const createUser = async (userData: CreateUserData): Promise<User> => {
   const response = await api.post<{ data: User }>('/users', userData);
-  return response.data.data;
+  return response.data;
 };
 
 export const updateUser = async (id: string, userData: UpdateUserData): Promise<User> => {
   const response = await api.put<{ data: User }>(`/users/${id}`, userData);
-  return response.data.data;
+  return response.data;
 };
 
 export const deleteUser = async (id: string): Promise<void> => {
