@@ -12,7 +12,7 @@ export const getProducts = async (filters: {
   try {
     // Create a new axios instance without the auth interceptor for public endpoints
     const publicApi = api.create();
-    const response = await publicApi.get(PRODUCT_API, { 
+    const response = await publicApi.get(PRODUCT_API, {
       params: { ...filters, public: true },
       // Don't include auth token for public endpoints
       headers: {
@@ -29,8 +29,8 @@ export const getProducts = async (filters: {
       return mockProducts.filter(product => {
         if (filters.type && product.type !== filters.type) return false;
         if (filters.isActive !== undefined && product.isActive !== filters.isActive) return false;
-        if (filters.search && !product.name.toLowerCase().includes(filters.search.toLowerCase()) && 
-            !product.description.toLowerCase().includes(filters.search.toLowerCase())) return false;
+        if (filters.search && !product.name.toLowerCase().includes(filters.search.toLowerCase()) &&
+          !product.description.toLowerCase().includes(filters.search.toLowerCase())) return false;
         return true;
       });
     }
@@ -45,8 +45,8 @@ export const getProducts = async (filters: {
     return mockProducts.filter(product => {
       if (filters.type && product.type !== filters.type) return false;
       if (filters.isActive !== undefined && product.isActive !== filters.isActive) return false;
-      if (filters.search && !product.name.toLowerCase().includes(filters.search.toLowerCase()) && 
-          !product.description.toLowerCase().includes(filters.search.toLowerCase())) return false;
+      if (filters.search && !product.name.toLowerCase().includes(filters.search.toLowerCase()) &&
+        !product.description.toLowerCase().includes(filters.search.toLowerCase())) return false;
       return true;
     });
   }
@@ -59,14 +59,14 @@ export const getProductById = async (id: string): Promise<Product> => {
       const response = await api.get(`${PRODUCT_API}/${id}`);
       if (response.data && (response.data.data || response.data)) {
         const product = response.data.data || response.data;
-        
+
         // Parse JSON string fields to objects
         const jsonFields = [
-          'hotel_details', 'flight_details', 'sport_details', 
-          'entertainment_details', 'package_details', 'insurance_details', 
+          'hotel_details', 'flight_details', 'sport_details',
+          'entertainment_details', 'package_details', 'insurance_details',
           'car_details', 'cruise_details', 'details'
         ];
-        
+
         jsonFields.forEach(field => {
           if (product[field] && typeof product[field] === 'string') {
             try {
@@ -76,20 +76,20 @@ export const getProductById = async (id: string): Promise<Product> => {
             }
           }
         });
-        
+
         return product;
       }
     } catch (apiError) {
       console.log('API request failed, falling back to mock data');
       // API request failed, continue to fallback
     }
-    
+
     // Fallback to mock data
     const mockProduct = mockProducts.find(p => p.id === id);
     if (mockProduct) {
       return mockProduct;
     }
-    
+
     throw new Error(`Product with id ${id} not found`);
   } catch (error) {
     console.error(`Error fetching product with id ${id}:`, error);
@@ -114,13 +114,13 @@ export const createProduct = async (productData: ProductFormData): Promise<Produ
       console.log('API create failed, using mock data');
       // Continue to fallback
     }
-    
+
     // Mock implementation when API fails
     console.log('Creating product with mock data');
-    
+
     // Generate a new unique ID (simple implementation)
     const newId = String(Math.max(...mockProducts.map(p => Number(p.id))) + 1);
-    
+
     // Create new product with the provided data and some defaults
     const newProduct: Product = {
       id: newId,
@@ -135,10 +135,10 @@ export const createProduct = async (productData: ProductFormData): Promise<Produ
       updatedAt: new Date().toISOString(),
       rating: productData.rating || 4.0
     };
-    
+
     // Add to mock data for future reference
     mockProducts.push(newProduct);
-    
+
     return newProduct;
   } catch (error) {
     console.error('Error creating product:', error);
@@ -158,23 +158,23 @@ export const updateProduct = async (id: string, productData: Partial<ProductForm
       console.log('API update failed, using mock data');
       // Continue to fallback
     }
-    
+
     // Find the product in mock data
     const productIndex = mockProducts.findIndex(p => p.id === id);
     if (productIndex === -1) {
       throw new Error(`Product with id ${id} not found`);
     }
-    
+
     // Update the product with new data
     const updatedProduct = {
       ...mockProducts[productIndex],
       ...productData,
       updatedAt: new Date().toISOString()
     };
-    
+
     // Replace in the mock data array
     mockProducts[productIndex] = updatedProduct as Product;
-    
+
     return updatedProduct as Product;
   } catch (error) {
     console.error(`Error updating product with id ${id}:`, error);
@@ -192,16 +192,16 @@ export const deleteProduct = async (id: string): Promise<void> => {
       console.log('API delete failed, using mock data');
       // Continue to fallback
     }
-    
+
     // Find the product in mock data
     const productIndex = mockProducts.findIndex(p => p.id === id);
     if (productIndex === -1) {
       throw new Error(`Product with id ${id} not found`);
     }
-    
+
     // Remove from the mock data array
     mockProducts.splice(productIndex, 1);
-    
+
     return;
   } catch (error) {
     console.error(`Error deleting product with id ${id}:`, error);
@@ -211,36 +211,32 @@ export const deleteProduct = async (id: string): Promise<void> => {
 
 export const toggleProductStatus = async (id: string, isActive: boolean): Promise<Product> => {
   try {
-    // Try API first
-    try {
-      const response = await api.patch(`${PRODUCT_API}/${id}/status`, { isActive });
-      if (response.data && (response.data.data || response.data)) {
-        return response.data.data || response.data;
-      }
-    } catch (apiError) {
-      console.log('API toggle status failed, using mock data');
-      // Continue to fallback
+    const response = await api.post(`${PRODUCT_API}/${id}/toggle-status`, {
+      is_active: isActive ? 1 : 0 // convert boolean to expected integer format
+    });
+
+    if (response.data && (response.data.data || response.data)) {
+      return response.data.data || response.data;
     }
-    
-    // Find the product in mock data
+
+    throw new Error('Unexpected API response format');
+  } catch (apiError) {
+    console.error(`API error toggling status for product ${id}:`, apiError);
+
+    // Optional fallback to mock data
     const productIndex = mockProducts.findIndex(p => p.id === id);
     if (productIndex === -1) {
       throw new Error(`Product with id ${id} not found`);
     }
-    
-    // Update the status
+
     const updatedProduct = {
       ...mockProducts[productIndex],
       isActive,
       updatedAt: new Date().toISOString()
     };
-    
-    // Replace in the mock data array
+
     mockProducts[productIndex] = updatedProduct as Product;
-    
+
     return updatedProduct as Product;
-  } catch (error) {
-    console.error(`Error toggling status for product with id ${id}:`, error);
-    throw error;
   }
 };

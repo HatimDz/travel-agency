@@ -322,7 +322,7 @@ export function WelcomePage() {
                         <div className="flex justify-between items-center mb-3">
                           <div>
                             <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-                              ${product.price}
+                              ${product.sale_price}
                             </span>
                             <span className="text-sm font-medium text-gray-500 ml-1">
                               {product.type === 'hotel' ? '/ night' : product.type === 'flight' ? '/ person' : ''}

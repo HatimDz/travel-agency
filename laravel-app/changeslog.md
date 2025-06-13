@@ -118,3 +118,6 @@
 
 ## 2025-06-06 03:58:00 - Orders APIs
 - Régler le probléme sur la méthode hasRole() 
+
+## 2025-06-13 10:05:00 - Products APIs
+- Ajouter original_price et sale_price

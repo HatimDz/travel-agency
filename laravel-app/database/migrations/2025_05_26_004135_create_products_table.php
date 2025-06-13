@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('type'); // hotel, flight, sport, entertainment, package, car_rental, insurance, cruise
             $table->text('description')->nullable();
-            $table->decimal('price', 10, 2);
+            $table->decimal('original_price', 10, 2);
+            $table->decimal('sale_price', 10, 2);
             $table->string('location')->nullable();
             $table->decimal('rating', 3, 1)->nullable();
             $table->string('image')->nullable();

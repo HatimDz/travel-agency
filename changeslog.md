@@ -1962,12 +1962,15 @@
 **User-approved logic**: Add Swagger UI for API testing.
 
 ## 2025-06-11
-- Get dynamic data in welcome and shop and admin page for products
+- Get dynamic data in welcome page and shop page 
+- Get dynalic data in admin page for products
 - Show dynamic data in edit product
-- Sow the the count of product in the menu
+- Show the the count of product in the menu
 
 ## 2025-06-12
 - Show the correct role in the detail and list of users
-- Toast (alert) not work
 - Create and Edit user work
-- Toast do a lot of problem in the plateform
+- Toast (alert) not work and doing a lot of problem in the plateform
+
+## 2025-06-13
+- Deactivate and Activate product now work
