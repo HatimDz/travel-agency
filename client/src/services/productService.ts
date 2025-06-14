@@ -146,36 +146,13 @@ export const createProduct = async (productData: ProductFormData): Promise<Produ
   }
 };
 
-export const updateProduct = async (id: string, productData: Partial<ProductFormData>): Promise<Product> => {
+export const updateProduct = async (
+  id: string,
+  productData: Partial<ProductFormData>
+): Promise<Product> => {
   try {
-    // Try API first
-    try {
-      const response = await api.put(`${PRODUCT_API}/${id}`, productData);
-      if (response.data && (response.data.data || response.data)) {
-        return response.data.data || response.data;
-      }
-    } catch (apiError) {
-      console.log('API update failed, using mock data');
-      // Continue to fallback
-    }
-
-    // Find the product in mock data
-    const productIndex = mockProducts.findIndex(p => p.id === id);
-    if (productIndex === -1) {
-      throw new Error(`Product with id ${id} not found`);
-    }
-
-    // Update the product with new data
-    const updatedProduct = {
-      ...mockProducts[productIndex],
-      ...productData,
-      updatedAt: new Date().toISOString()
-    };
-
-    // Replace in the mock data array
-    mockProducts[productIndex] = updatedProduct as Product;
-
-    return updatedProduct as Product;
+    const response = await api.put(`${PRODUCT_API}/${id}`, productData);
+    return response.data.data || response.data;
   } catch (error) {
     console.error(`Error updating product with id ${id}:`, error);
     throw error;

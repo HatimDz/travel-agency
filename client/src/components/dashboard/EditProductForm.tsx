@@ -43,7 +43,7 @@ import {
   Loader2,
   DollarSign
 } from 'lucide-react';
-import { getProductById } from '@/services/productService';
+import { getProductById, updateProduct } from '@/services/productService';
 
 // Form schema validation
 const productFormSchema = z.object({
@@ -78,6 +78,8 @@ export function EditProductForm() {
   // Fetch product data
   useEffect(() => {
     const fetchProduct = async () => {
+      if (!id) return;
+
       try {
         setIsLoading(true);
 
@@ -141,6 +143,8 @@ export function EditProductForm() {
 
   // Form submission handler
   async function onSubmit(values: z.infer<typeof productFormSchema>) {
+    if (!id) return;
+
     try {
       setIsSubmitting(true);
 
@@ -154,12 +158,12 @@ export function EditProductForm() {
       const discountPercentage = values.original_price > 0
         ? Math.round((1 - (values.sale_price / values.original_price)) * 100)
         : 0;
-
+   
       // Simulate API call with a delay
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       // In a real app, this would be an API call
-      // await axios.put(`/api/products/${id}`, submissionData);
+      await updateProduct(id, submissionData);
 
       console.log('Product updated:', submissionData);
       console.log(`Discount applied: ${discountPercentage}%`);
@@ -231,198 +235,196 @@ export function EditProductForm() {
           <CardDescription>Update the details of your product</CardDescription>
         </CardHeader>
         <CardContent className="p-6">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }: { field: any }) => (
-                    <FormItem>
-                      <FormLabel>Product Name</FormLabel>
+          <Form onSubmit={form.handleSubmit(onSubmit as any)}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }: { field: any }) => (
+                  <FormItem>
+                    <FormLabel>Product Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter product name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }: { field: any }) => (
+                  <FormItem>
+                    <FormLabel>Product Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <Input placeholder="Enter product name" {...field} />
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a product type" />
+                        </SelectTrigger>
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                      <SelectContent>
+                        <SelectItem value="hotel">Hotel</SelectItem>
+                        <SelectItem value="flight">Flight</SelectItem>
+                        <SelectItem value="package">Package</SelectItem>
+                        <SelectItem value="activity">Activity / Tour</SelectItem>
+                        <SelectItem value="entertainment">Entertainment</SelectItem>
+                        <SelectItem value="sport">Sport</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="type"
-                  render={({ field }: { field: any }) => (
-                    <FormItem>
-                      <FormLabel>Product Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a product type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="hotel">Hotel</SelectItem>
-                          <SelectItem value="flight">Flight</SelectItem>
-                          <SelectItem value="package">Package</SelectItem>
-                          <SelectItem value="activity">Activity / Tour</SelectItem>
-                          <SelectItem value="entertainment">Entertainment</SelectItem>
-                          <SelectItem value="sport">Sport</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <FormField
+                control={form.control}
+                name="original_price"
+                render={({ field }: { field: any }) => (
+                  <FormItem>
+                    <FormLabel>Original Price (USD)</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          className="pl-8"
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            // Auto-update sale price if it's empty or higher than original price
+                            const originalPrice = parseFloat(e.target.value);
+                            const salePrice = form.getValues('sale_price');
+                            if (!salePrice || salePrice > originalPrice) {
+                              form.setValue('sale_price', originalPrice);
+                            }
+                          }}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormDescription>
+                      Regular price before any discounts
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="original_price"
-                  render={({ field }: { field: any }) => (
-                    <FormItem>
-                      <FormLabel>Original Price (USD)</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                          <Input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            className="pl-8"
-                            {...field}
-                            onChange={(e) => {
-                              field.onChange(e);
-                              // Auto-update sale price if it's empty or higher than original price
-                              const originalPrice = parseFloat(e.target.value);
-                              const salePrice = form.getValues('sale_price');
-                              if (!salePrice || salePrice > originalPrice) {
-                                form.setValue('sale_price', originalPrice);
-                              }
-                            }}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormDescription>
-                        Regular price before any discounts
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="sale_price"
-                  render={({ field }: { field: any }) => (
-                    <FormItem>
-                      <FormLabel>Sale Price (USD)</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                          <Input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            className="pl-8"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormDescription>
-                        Current selling price (must be equal to or less than original price)
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }: { field: any }) => (
-                    <FormItem>
-                      <FormLabel>Location</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                          <Input className="pl-9" placeholder="Enter location" {...field} />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }: { field: any }) => (
-                    <FormItem className="md:col-span-2">
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Enter product description"
-                          className="h-32 resize-none"
+              <FormField
+                control={form.control}
+                name="sale_price"
+                render={({ field }: { field: any }) => (
+                  <FormItem>
+                    <FormLabel>Sale Price (USD)</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          className="pl-8"
                           {...field}
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                      </div>
+                    </FormControl>
+                    <FormDescription>
+                      Current selling price (must be equal to or less than original price)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="is_active"
-                  render={({ field }: { field: any }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                      <FormControl>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={field.value}
-                            onChange={field.onChange}
-                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                          />
-                          <div className="space-y-1 leading-none">
-                            <FormLabel>Active Status</FormLabel>
-                            <FormDescription>
-                              Show this product to customers
-                            </FormDescription>
-                          </div>
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }: { field: any }) => (
+                  <FormItem>
+                    <FormLabel>Location</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                        <Input className="pl-9" placeholder="Enter location" {...field} />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }: { field: any }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Enter product description"
+                        className="h-32 resize-none"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="is_active"
+                render={({ field }: { field: any }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={field.value}
+                          onChange={field.onChange}
+                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                        />
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Active Status</FormLabel>
+                          <FormDescription>
+                            Show this product to customers
+                          </FormDescription>
                         </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
+                      </div>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
 
-              <div className="flex justify-end gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => navigate('/dashboard/products-enhanced')}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Saving Changes...
-                    </>
-                  ) : (
-                    <>
-                      <Check className="mr-2 h-4 w-4" />
-                      Save Changes
-                    </>
-                  )}
-                </Button>
-              </div>
-            </form>
+            <div className="flex justify-end gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate('/dashboard/products-enhanced')}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving Changes...
+                  </>
+                ) : (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Save Changes
+                  </>
+                )}
+              </Button>
+            </div>
           </Form>
         </CardContent>
       </Card>

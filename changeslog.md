@@ -1974,3 +1974,6 @@
 
 ## 2025-06-13
 - Deactivate and Activate product now work
+
+## 2025-06-14
+- Edit product now work

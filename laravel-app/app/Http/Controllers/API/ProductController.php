@@ -179,7 +179,8 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'type' => 'required|string|in:hotel,flight,sport,entertainment,package,other',
             'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
+            'original_price' => 'sometimes|required|numeric|min:0',
+            'sale_price' => 'sometimes|required|numeric|min:0',
             'is_active' => 'sometimes|boolean',
         ]);
 
@@ -310,7 +311,8 @@ class ProductController extends Controller
             'name' => 'sometimes|required|string|max:255',
             'type' => 'sometimes|required|string|in:hotel,flight,sport,entertainment,package,other',
             'description' => 'nullable|string',
-            'price' => 'sometimes|required|numeric|min:0',
+            'original_price' => 'sometimes|required|numeric|min:0',
+            'sale_price' => 'sometimes|required|numeric|min:0',
             'is_active' => 'sometimes|boolean',
         ]);
 
