@@ -62,7 +62,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { getProducts } from '@/services/productService';
-import { toggleProductStatus } from '@/services/productService';
+import { toggleProductStatus, deleteProduct } from '@/services/productService';
 
 // Type definition for products
 interface Product {
@@ -177,7 +177,7 @@ export function ProductsPageEnhanced() {
   const handleDeleteProduct = async (id: number) => {
     try {
       // In a real app, this would be an API call
-      // await axios.delete(`/api/products/${id}`);
+      await deleteProduct(id);
       
       setProducts(prev => prev.filter(product => product.id !== id));
       
@@ -203,7 +203,6 @@ export function ProductsPageEnhanced() {
       if (!product) return;
       
       // In a real app, this would be an API call
-      // await axios.patch(`/api/products/${id}`, { is_active: !product.is_active });
       await toggleProductStatus(id, !product.is_active);
       
       setProducts(prev => prev.map(p => 

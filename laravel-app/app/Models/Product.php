@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @OA\Schema(
  *   schema="Product",
- *   required={"name", "type", "original_price ", "sale_price },
+ *   required={"name", "type", "original_price", "sale_price" },
  *   @OA\Property(property="id", type="integer"),
  *   @OA\Property(property="name", type="string", example="Luxury Hotel"),
  *   @OA\Property(property="description", type="string", nullable=true, example="A beautiful luxury hotel with sea view"),
@@ -69,7 +69,8 @@ class Product extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'price' => 'decimal:2',
+        'original_price' => 'decimal:2',
+        'sale_price' => 'decimal:2',
         'rating' => 'float',
         'capacity' => 'integer',
         'is_active' => 'boolean',

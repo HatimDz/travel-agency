@@ -1977,3 +1977,6 @@
 
 ## 2025-06-14
 - Edit product now work
+
+## 2025-06-16
+- Delete product now work

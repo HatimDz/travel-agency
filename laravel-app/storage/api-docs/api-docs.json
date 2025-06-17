@@ -848,7 +848,8 @@
                 "required": [
                     "name",
                     "type",
-                    "price"
+                    "original_price",
+                    "sale_price"
                 ],
                 "properties": {
                     "id": {
@@ -875,7 +876,12 @@
                         ],
                         "example": "hotel"
                     },
-                    "price": {
+                    "original_price ": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 299.99
+                    },
+                    "sale_price ": {
                         "type": "number",
                         "format": "float",
                         "example": 299.99
