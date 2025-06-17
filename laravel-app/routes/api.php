@@ -65,7 +65,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
     // Room Type Routes
     Route::apiResource('room-types', RoomTypeController::class);
-    
+    Route::apiResource('bundles', BundleController::class);
     // Room Amenity Routes
     Route::apiResource('room-amenities', \App\Http\Controllers\API\RoomAmenityController::class);
 

@@ -146,7 +146,7 @@ export function WelcomePage() {
                 <span className={`block text-transparent bg-clip-text bg-gradient-to-r ${gradientPreset.textGradient} animate-gradient-x`}>travel experience</span>
               </h1>
               <p className="mt-6 max-w-md mx-auto text-xl text-white/80 sm:text-2xl md:mt-8 md:max-w-3xl">
-                Discover amazing destinations and book your perfect stay with our curated selection of accommodations worldwide.
+                Discover amazing destinations and book your perfect stay with our curated selection of accommodations worldwide. 
               </p>
               <div className="mt-8 w-full max-w-lg mx-auto flex flex-col sm:flex-row sm:justify-center sm:space-x-4 space-y-4 sm:space-y-0 md:mt-12">
                 <Button

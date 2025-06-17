@@ -102,4 +102,9 @@ class Product extends Model
     {
         return $query->where('type', $type);
     }
+
+    public function bundles()
+    {
+        return $this->belongsToMany(Bundle::class, 'bundle_product')->withTimestamps();
+    }
 }
