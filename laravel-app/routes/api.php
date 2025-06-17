@@ -6,6 +6,7 @@ use App\Http\Controllers\API\HotelController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\RoomController;
 use App\Http\Controllers\API\RoomTypeController;
+use App\Http\Controllers\API\BundleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -65,7 +66,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
     // Room Type Routes
     Route::apiResource('room-types', RoomTypeController::class);
+
+    // Bundle Routes
     Route::apiResource('bundles', BundleController::class);
+    // Route::get('bundlest', [BundleController::class, 'index']);
+
     // Room Amenity Routes
     Route::apiResource('room-amenities', \App\Http\Controllers\API\RoomAmenityController::class);
 
