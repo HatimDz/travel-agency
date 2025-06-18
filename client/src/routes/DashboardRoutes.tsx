@@ -19,6 +19,7 @@ import { ReportsPage } from '@/components/dashboard/ReportsPage';
 import { CalendarPage } from '@/components/dashboard/CalendarPage';
 import { SubSuperAdminDashboard } from '../components/dashboard/SubSuperAdminDashboard';
 import { useAuth } from '@/hooks/useAuth';
+import { BundlesPage } from '@/components/dashboard/BundlesPage';
 
 export const DashboardRoutes: React.FC = () => {
   const { user } = useAuth();
@@ -36,6 +37,9 @@ export const DashboardRoutes: React.FC = () => {
         <Route path="products-enhanced/:id" element={<ComingSoon title="Product Details" />} />
         <Route path="products-enhanced/:id/edit" element={<EditProductForm />} />
         
+        <Route path="bundles" element={<BundlesPage />} />
+
+
         <Route path="hotels-enhanced" element={<HotelsPageEnhanced />} />
         <Route path="hotels-enhanced/new" element={<CreateHotelForm />} />
         <Route path="hotels-enhanced/:id" element={<ComingSoon title="Hotel Details" />} />

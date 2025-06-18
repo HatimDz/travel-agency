@@ -29,7 +29,8 @@ import {
   HelpCircle,
   HeartPulse,
   CreditCard,
-  LogOut
+  LogOut,
+  Gift
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -128,6 +129,13 @@ export function DashboardNav() {
           title: 'Flights',
           href: '/dashboard/flights-enhanced',
           icon: <Plane className="h-5 w-5" />,
+        },
+        {
+          title: 'Bundles',
+          href: '/dashboard/bundles',
+          icon: <Gift className="h-5 w-5" />,
+          badge: 'New',
+          badgeColor: 'default'
         },
       ]
     },
