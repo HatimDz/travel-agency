@@ -107,7 +107,9 @@ export function BundlesPage() {
     const fetchBundles = async () => {
       try {
         setLoading(true);
+        debugger
         const data = await getBundles();
+        
         setBundles(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error fetching bundles:', error);

@@ -1,6 +1,8 @@
 import api from './api';
+import { getToken } from './authService';
 
 const BUNDLE_API = '/bundles';
+
 
 export interface BundleFormData {
   name: string;
@@ -16,11 +18,15 @@ export const getBundles = async (filters: {
   isActive?: boolean;
 } = {}): Promise<any[]> => {
   try {
+    const token = getToken();
+    console.log("token :: ", token);
     const publicApi = api.create();
+    debugger
     const response = await publicApi.get(BUNDLE_API, {
-      params: { ...filters, public: true },
+      
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       validateStatus: (status) => status < 500
     });

@@ -104,6 +104,11 @@ export function CreateBundleForm() {
     return () => {};
   }, [toast]);
 
+    function tsesFunc (){
+      debugger
+      alert("test")
+    }
+
   const form = useForm<BundleFormData>({
     resolver: zodResolver(bundleFormSchema),
     defaultValues: {
@@ -115,7 +120,7 @@ export function CreateBundleForm() {
       product_ids: []
     }
   });
-
+    
     async function onSubmit(data: BundleFormData) {
         try {
         setIsSubmitting(true);
@@ -163,7 +168,7 @@ export function CreateBundleForm() {
         </CardHeader>
         <CardContent className="p-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
@@ -414,6 +419,7 @@ export function CreateBundleForm() {
                 </Button>
                 <Button
                   type="submit"
+                  onClick={form.handleSubmit(onSubmit)}
                   disabled={isSubmitting}
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
                 >

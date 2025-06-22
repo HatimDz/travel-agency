@@ -173,7 +173,7 @@ export function BundleEditPage() {
             <div className="text-center text-red-500 py-12">{error}</div>
           ) : (
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
@@ -424,6 +424,7 @@ export function BundleEditPage() {
                   </Button>
                   <Button
                     type="submit"
+                    onClick={form.handleSubmit(onSubmit)}
                     disabled={isSubmitting}
                     className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
                   >
