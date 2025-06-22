@@ -69,7 +69,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Bundle Routes
     Route::apiResource('bundles', BundleController::class);
-    // Route::get('bundlest', [BundleController::class, 'index']);
+    Route::post('bundles/{bundle}/toggle-status', [BundleController::class, 'toggleStatus']);
 
     // Room Amenity Routes
     Route::apiResource('room-amenities', \App\Http\Controllers\API\RoomAmenityController::class);

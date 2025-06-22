@@ -74,4 +74,21 @@ class BundleController extends Controller
 
         return response()->json(['message' => 'Bundle deleted successfully']);
     }
+
+    // POst /api/bundles/{id}//toggle-status
+    public function toggleStatus(Request $request, $id)
+    {
+        $request->validate([
+            'active' => 'required|boolean',
+        ]);
+
+        $bundle = Bundle::findOrFail($id);
+        $bundle->active = $request->active;
+        $bundle->save();
+
+        return response()->json([
+            'data' => $bundle,
+            'message' => 'Product status updated successfully'
+        ]);
+    }
 }

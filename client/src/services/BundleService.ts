@@ -3,7 +3,6 @@ import { getToken } from './authService';
 
 const BUNDLE_API = '/bundles';
 
-
 export interface BundleFormData {
   name: string;
   type: 'Silver' | 'Gold' | 'Platinum';
@@ -15,15 +14,12 @@ export interface BundleFormData {
 
 export const getBundles = async (filters: {
   search?: string;
-  isActive?: boolean;
 } = {}): Promise<any[]> => {
   try {
     const token = getToken();
-    console.log("token :: ", token);
     const publicApi = api.create();
-    debugger
+
     const response = await publicApi.get(BUNDLE_API, {
-      
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
@@ -58,15 +54,11 @@ export const getBundleById = async (id: string): Promise<any> => {
 
 export const createBundle = async (bundleData: BundleFormData): Promise<any> => {
   try {
-    debugger
     const payload = {
       ...bundleData
     };
-    debugger
     const response = await api.post(BUNDLE_API, payload);
-    debugger
     if (response.data && (response.data.data || response.data)) {
-        debugger
       return response.data.data || response.data;
     }
     // Fallback: return the bundleData with a mock id
@@ -82,11 +74,9 @@ export const updateBundle = async (
   bundleData: Partial<BundleFormData>
 ): Promise<any> => {
   try {
-    // Map 'active' to 'is_active' if your backend expects that
     const payload = {
       ...bundleData,
-      ...(bundleData.active !== undefined ? { is_active: bundleData.active } : {}),
-      active: undefined // Remove 'active' if not needed by backend
+      ...(bundleData.active !== undefined ? { active: bundleData.active } : {}),
     };
     const response = await api.put(`${BUNDLE_API}/${id}`, payload);
     return response.data.data || response.data;
@@ -106,10 +96,10 @@ export const deleteBundle = async (id: string): Promise<void> => {
   }
 };
 
-export const toggleBundleStatus = async (id: string, isActive: boolean): Promise<any> => {
+export const toggleBundleStatus = async (id: string, active: boolean): Promise<any> => {
   try {
     const response = await api.post(`${BUNDLE_API}/${id}/toggle-status`, {
-      is_active: isActive ? 1 : 0
+      active: active ? 1 : 0
     });
 
     if (response.data && (response.data.data || response.data)) {

@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { getProducts } from '@/services/productService';
 import { createBundle } from '@/services/BundleService';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -36,16 +36,16 @@ import { Loader2, Check, ArrowLeft } from 'lucide-react';
 
 // Utility to get a default image by type
 function getDefaultImageByType(type?: string) {
-    switch (type) {
-        case 'hotel':
-            return '/images/default-hotel.jpg';
-        case 'flight':
-            return '/images/default-flight.jpg';
-        case 'tour':
-            return '/images/default-tour.jpg';
-        default:
-            return '/images/default-product.jpg';
-    }
+  switch (type) {
+    case 'hotel':
+      return '/images/default-hotel.jpg';
+    case 'flight':
+      return '/images/default-flight.jpg';
+    case 'tour':
+      return '/images/default-tour.jpg';
+    default:
+      return '/images/default-product.jpg';
+  }
 }
 
 const bundleFormSchema = z.object({
@@ -101,13 +101,8 @@ export function CreateBundleForm() {
       }
     };
     fetchProductsList();
-    return () => {};
+    return () => { };
   }, [toast]);
-
-    function tsesFunc (){
-      debugger
-      alert("test")
-    }
 
   const form = useForm<BundleFormData>({
     resolver: zodResolver(bundleFormSchema),
@@ -120,30 +115,29 @@ export function CreateBundleForm() {
       product_ids: []
     }
   });
-    
-    async function onSubmit(data: BundleFormData) {
-        try {
-        setIsSubmitting(true);
-        debugger
-        await createBundle({
-            ...data
-        });
-        toast({
-            title: "Bundle Created",
-            description: "Your bundle has been successfully created.",
-            variant: "default"
-        });
-        navigate('/dashboard/bundles');
-        } catch (error) {
-        toast({
-            title: "Error",
-            description: "Failed to create the bundle. Please try again.",
-            variant: "destructive"
-        });
-        } finally {
-        setIsSubmitting(false);
+
+  async function onSubmit(data: BundleFormData) {
+    try {
+      setIsSubmitting(true);
+      await createBundle({
+        ...data
+      });
+      toast({
+        title: "Bundle Created",
+        description: "Your bundle has been successfully created.",
+        variant: "default"
+      });
+      navigate('/dashboard/bundles');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create the bundle. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-    }
+  }
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -238,11 +232,10 @@ export function CreateBundleForm() {
                       <FormControl>
                         <div className="flex items-center space-x-2">
                           <div
-                            className={`h-6 w-6 rounded-full border flex items-center justify-center cursor-pointer ${
-                              field.value
+                            className={`h-6 w-6 rounded-full border flex items-center justify-center cursor-pointer ${field.value
                                 ? 'bg-green-500 border-green-500 text-white'
                                 : 'bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600'
-                            }`}
+                              }`}
                             onClick={() => form.setValue('active', !field.value)}>
                             {field.value && <Check className="h-4 w-4" />}
                           </div>
