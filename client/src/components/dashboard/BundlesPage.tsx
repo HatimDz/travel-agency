@@ -1,42 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from '@/components/ui/select';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { 
-  Package, 
-  Search, 
-  Filter, 
-  Plus, 
-  MoreHorizontal, 
-  Edit, 
-  Trash, 
+import {
+  Package,
+  Search,
+  Filter,
+  Plus,
+  MoreHorizontal,
+  Edit,
+  Trash,
   Eye,
-  ArrowUpDown,
   Download,
   UploadCloud,
   RefreshCw,
@@ -45,37 +43,33 @@ import {
   Calendar,
   Loader2,
   XCircle,
-  AlertCircle,
-  Pencil,
-  MapPin,
-  DollarSign
+  MapPin
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
-// Replace productService with bundleService
-import { getBundles, toggleBundleStatus, deleteBundle } from '@/services/BundleService';
+import {
+  getBundles,
+  toggleBundleStatus,
+  deleteBundle
+} from '@/services/BundleService';
 
-// Type definition for bundles
+// Bundle type based on your BundleService
 interface Bundle {
-  id: number;
+  id: number | string;
   name: string;
+  type: 'Silver' | 'Gold' | 'Platinum';
   description: string;
   price: number;
-  original_price: number;
-  sale_price: number;
-  location: string;
-  is_active: boolean;
-  created_at: string;
-  // Add more fields if needed for bundles
+  active: boolean;
+  product_ids: number[];
+  created_at?: string;
 }
 
-// Icon for bundle
 const getBundleIcon = () => (
   <Package className="h-5 w-5 text-amber-500" />
 );
 
-// Format price with currency
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -83,8 +77,8 @@ const formatPrice = (price: number) => {
   }).format(price);
 };
 
-// Format date
-const formatDate = (dateString: string) => {
+const formatDate = (dateString?: string) => {
+  if (!dateString) return '';
   const date = new Date(dateString);
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
@@ -99,24 +93,22 @@ export function BundlesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [view, setView] = useState<'grid' | 'table'>('table');
-  
+
   const navigate = useNavigate();
   const { toast } = useToast();
-  
-  // Add bundle handler
+
+  // bundle handler
   const handleAddBundle = () => {
-    // navigate('/dashboard/bundles/new');
+    navigate('/dashboard/bundles/new');
   };
 
-  // Fetch bundles data
+  // Fetch bundles data from BundleService
   useEffect(() => {
     const fetchBundles = async () => {
       try {
         setLoading(true);
-        // Simulate API call with delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const response = await getBundles();
-        setBundles(response.data);
+        const data = await getBundles();
+        setBundles(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error fetching bundles:', error);
         toast({
@@ -133,19 +125,21 @@ export function BundlesPage() {
   }, [toast]);
 
   // Filter bundles based on search term and filters
-  const filteredBundles = bundles.filter(bundle => {
-    const matchesSearch = 
-      bundle.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      bundle.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      bundle.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || 
-      (filterStatus === 'active' && bundle.is_active) || 
-      (filterStatus === 'inactive' && !bundle.is_active);
+  const filteredBundles = (bundles || []).filter(bundle => {
+    const matchesSearch =
+      bundle.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      bundle.description.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      filterStatus === 'all' ||
+      (filterStatus === 'active' && bundle.active) ||
+      (filterStatus === 'inactive' && !bundle.active);
+
     return matchesSearch && matchesStatus;
   });
 
   // Delete bundle handler
-  const handleDeleteBundle = async (id: number) => {
+  const handleDeleteBundle = async (id: number | string) => {
     try {
       await deleteBundle(id);
       setBundles(prev => prev.filter(bundle => bundle.id !== id));
@@ -164,17 +158,17 @@ export function BundlesPage() {
   };
 
   // Toggle bundle status handler
-  const handleToggleStatus = async (id: number) => {
+  const handleToggleStatus = async (id: number | string) => {
     try {
       const bundle = bundles.find(b => b.id === id);
       if (!bundle) return;
-      await toggleBundleStatus(id, !bundle.is_active);
-      setBundles(prev => prev.map(b => 
-        b.id === id ? { ...b, is_active: !b.is_active } : b
+      await toggleBundleStatus(id, !bundle.active);
+      setBundles(prev => prev.map(b =>
+        b.id === id ? { ...b, active: !b.active } : b
       ));
       toast({
-        title: bundle.is_active ? "Bundle Deactivated" : "Bundle Activated",
-        description: `The bundle status has been updated to ${bundle.is_active ? 'inactive' : 'active'}.`,
+        title: bundle.active ? "Bundle Deactivated" : "Bundle Activated",
+        description: `The bundle status has been updated to ${bundle.active ? 'inactive' : 'active'}.`,
       });
     } catch (error) {
       console.error('Error updating bundle status:', error);
@@ -204,50 +198,26 @@ export function BundlesPage() {
       ),
     },
     {
-      accessorKey: 'price',
-      header: 'Price',
-      cell: ({ row }) => {
-        const bundle = row.original;
-        const hasDiscount = bundle.original_price > bundle.sale_price;
-        const discountPercentage = hasDiscount
-          ? Math.round((1 - (bundle.sale_price / bundle.original_price)) * 100)
-          : 0;
-        return (
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-gray-900 dark:text-gray-100">
-                {formatPrice(bundle.sale_price)}
-              </span>
-              {hasDiscount && (
-                <Badge className="bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">
-                  -{discountPercentage}%
-                </Badge>
-              )}
-            </div>
-            {hasDiscount && (
-              <div className="text-sm text-gray-500 dark:text-gray-400 line-through">
-                {formatPrice(bundle.original_price)}
-              </div>
-            )}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'location',
-      header: 'Location',
+      accessorKey: 'type',
+      header: 'Type',
       cell: ({ row }) => (
-        <div className="flex items-center text-gray-700 dark:text-gray-300">
-          <MapPin className="h-4 w-4 mr-1 text-gray-400" />
-          {row.original.location}
-        </div>
+        <span className="font-semibold">{row.original.type}</span>
       ),
     },
     {
-      accessorKey: 'is_active',
-      header: 'Status',
+      accessorKey: 'price',
+      header: 'Price',
       cell: ({ row }) => (
-        row.original.is_active ? (
+        <span className="font-medium text-gray-900 dark:text-gray-100">
+          {formatPrice(row.original.price)}
+        </span>
+      ),
+    },
+    {
+      accessorKey: 'active',
+      header: 'Status',
+      cell: ({ row }) =>
+        row.original.active ? (
           <Badge className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">
             <CheckCircle className="h-3 w-3 mr-1" />
             Active
@@ -257,8 +227,7 @@ export function BundlesPage() {
             <XCircle className="h-3 w-3 mr-1" />
             Inactive
           </Badge>
-        )
-      ),
+        ),
     },
     {
       accessorKey: 'created_at',
@@ -282,25 +251,25 @@ export function BundlesPage() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem 
-              onClick={() => navigate(`/dashboard/bundles/${row.original.id}`)}
+            <DropdownMenuItem
+              onClick={() => navigate(`/dashboard/bundle-detail/${row.original.id}`)}
               className="cursor-pointer"
             >
               <Eye className="h-4 w-4 mr-2" />
               View Details
             </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => navigate(`/dashboard/bundles/${row.original.id}/edit`)}
+            <DropdownMenuItem
+              onClick={() => navigate(`/dashboard/bundle-edit/${row.original.id}`)}
               className="cursor-pointer"
             >
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => handleToggleStatus(row.original.id)}
               className="cursor-pointer"
             >
-              {row.original.is_active ? (
+              {row.original.active ? (
                 <>
                   <XCircle className="h-4 w-4 mr-2" />
                   Deactivate
@@ -313,7 +282,7 @@ export function BundlesPage() {
               )}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => handleDeleteBundle(row.original.id)}
               className="text-red-600 focus:text-red-600 cursor-pointer"
             >
@@ -392,7 +361,7 @@ export function BundlesPage() {
             </div>
             <div className="flex items-center gap-2">
               <div className="hidden md:flex items-center gap-2">
-                <Button 
+                <Button
                   variant={view === 'table' ? "default" : "outline"}
                   size="sm"
                   onClick={() => setView('table')}
@@ -416,7 +385,7 @@ export function BundlesPage() {
                   </svg>
                   Table
                 </Button>
-                <Button 
+                <Button
                   variant={view === 'grid' ? "default" : "outline"}
                   size="sm"
                   onClick={() => setView('grid')}
@@ -478,15 +447,15 @@ export function BundlesPage() {
             <div>
               {view === 'table' && (
                 <div className="w-full">
-                  <DataTable 
-                    columns={columns} 
-                    data={filteredBundles} 
+                  <DataTable
+                    columns={columns}
+                    data={filteredBundles}
                     searchKey="name"
                     onAddNew={handleAddBundle}
                     filterOptions={[
                       {
                         label: "Status",
-                        value: "is_active",
+                        value: "active",
                         options: [
                           { label: "All", value: "all" },
                           { label: "Active", value: "true" },
@@ -498,7 +467,7 @@ export function BundlesPage() {
                   />
                 </div>
               )}
-              
+
               {view === 'grid' && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
                   {filteredBundles.map(bundle => (
@@ -511,42 +480,22 @@ export function BundlesPage() {
                             </div>
                             <div>
                               <CardTitle className="text-base">{bundle.name}</CardTitle>
-                              <CardDescription className="text-xs">Bundle</CardDescription>
+                              <CardDescription className="text-xs">{bundle.type} Bundle</CardDescription>
                             </div>
                           </div>
-                          <Badge variant={bundle.is_active ? "default" : "secondary"}>
-                            {bundle.is_active ? "Active" : "Inactive"}
+                          <Badge variant={bundle.active ? "default" : "secondary"}>
+                            {bundle.active ? "Active" : "Inactive"}
                           </Badge>
                         </div>
                       </CardHeader>
                       <CardContent className="pb-2">
                         <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{bundle.description}</p>
-                        <div className="mt-2 text-sm flex items-center text-gray-500 dark:text-gray-400">
-                          <MapPin className="h-3 w-3 mr-1" />
-                          {bundle.location}
-                        </div>
                       </CardContent>
                       <CardFooter className="flex justify-between pt-0">
                         <div>
-                          {bundle.original_price > bundle.sale_price ? (
-                            <div className="flex flex-col">
-                              <div className="flex items-center gap-2">
-                                <span className="text-lg font-semibold">
-                                  {formatPrice(bundle.sale_price)}
-                                </span>
-                                <Badge className="bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">
-                                  -{Math.round((1 - (bundle.sale_price / bundle.original_price)) * 100)}%
-                                </Badge>
-                              </div>
-                              <div className="text-sm text-gray-500 dark:text-gray-400 line-through">
-                                {formatPrice(bundle.original_price)}
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="text-lg font-semibold">{formatPrice(bundle.sale_price)}</div>
-                          )}
+                          <span className="text-lg font-semibold">{formatPrice(bundle.price)}</span>
                         </div>
-                        <Button size="sm" variant="outline" onClick={() => navigate(`/bundles/${bundle.id}`)}>
+                        <Button size="sm" variant="outline" onClick={() => navigate(`/dashboard/bundle-detail/${bundle.id}`)}>
                           <Eye className="h-4 w-4 mr-1" />
                           View
                         </Button>
@@ -561,7 +510,7 @@ export function BundlesPage() {
         <CardFooter className="border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 py-3">
           <div className="flex items-center justify-between w-full">
             <div className="text-sm text-gray-500 dark:text-gray-400">
-              Showing {filteredBundles.length} of {bundles.length} bundles
+              Showing {(filteredBundles || []).length} of {(bundles || []).length} bundles
             </div>
           </div>
         </CardFooter>

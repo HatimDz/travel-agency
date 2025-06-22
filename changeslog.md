@@ -1980,3 +1980,17 @@
 
 ## 2025-06-16
 - Delete product now work
+
+## 2025-06-17
+- Created UML design for Bundles
+- Developed the Bundles API with full CRUD operations
+- Tested the Bundles API
+
+## 2025-06-20
+- Added "Bundles" to the dashboard navigation and configured its route
+- Created a service to interact with the Bundles API
+- Developed the Bundles management interface in the dashboard and mapped the data
+- Configured the delete functionality
+- Created the interface to add a new Bundle and set up its routing
+- Created the interface to view Bundle details and added its route in DashboardRoutes
+- Created the interface to edit Bundles and added its route in DashboardRoutes

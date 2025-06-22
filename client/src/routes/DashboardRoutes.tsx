@@ -20,6 +20,9 @@ import { CalendarPage } from '@/components/dashboard/CalendarPage';
 import { SubSuperAdminDashboard } from '../components/dashboard/SubSuperAdminDashboard';
 import { useAuth } from '@/hooks/useAuth';
 import { BundlesPage } from '@/components/dashboard/BundlesPage';
+import { CreateBundleForm } from '@/components/dashboard/CreateBundleForm';
+import { BudleDetailsPage } from '@/components/dashboard/BudleDetailsPage';
+import { BundleEditPage } from '@/components/dashboard/BundleEditPage';
 
 export const DashboardRoutes: React.FC = () => {
   const { user } = useAuth();
@@ -36,9 +39,11 @@ export const DashboardRoutes: React.FC = () => {
         <Route path="products-enhanced/new" element={<CreateProductForm />} />
         <Route path="products-enhanced/:id" element={<ComingSoon title="Product Details" />} />
         <Route path="products-enhanced/:id/edit" element={<EditProductForm />} />
-        
+        {/* Bundles routes */}
         <Route path="bundles" element={<BundlesPage />} />
-
+        <Route path="bundles/new" element={<CreateBundleForm />} />
+        <Route path="bundle-detail/:id" element={<BudleDetailsPage />} />
+        <Route path="bundle-edit/:id" element={<BundleEditPage />} />
 
         <Route path="hotels-enhanced" element={<HotelsPageEnhanced />} />
         <Route path="hotels-enhanced/new" element={<CreateHotelForm />} />
