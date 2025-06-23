@@ -1,6 +1,5 @@
 import api from './api';
 import { getToken } from './authService';
-// import { API_TOKEN } from '../../.env';
 
 const BUNDLE_API = '/bundles';
 const BUNDLE_API_PUB = '/bundles-client';
