@@ -35,18 +35,18 @@ import { useToast } from '@/components/ui/use-toast';
 import { Loader2, Check, ArrowLeft } from 'lucide-react';
 
 // Utility to get a default image by type
-function getDefaultImageByType(type?: string) {
-  switch (type) {
-    case 'hotel':
-      return '/images/default-hotel.jpg';
-    case 'flight':
-      return '/images/default-flight.jpg';
-    case 'tour':
-      return '/images/default-tour.jpg';
-    default:
-      return '/images/default-product.jpg';
-  }
-}
+// function getDefaultImageByType(type?: string) {
+//   switch (type) {
+//     case 'hotel':
+//       return '/images/default-hotel.jpg';
+//     case 'flight':
+//       return '/images/default-flight.jpg';
+//     case 'tour':
+//       return '/images/default-tour.jpg';
+//     default:
+//       return '/images/default-product.jpg';
+//   }
+// }
 
 const bundleFormSchema = z.object({
   name: z.string().min(3, { message: "Bundle name must be at least 3 characters." }),
@@ -93,7 +93,7 @@ export function BundleEditPage() {
         const formattedProducts = data.map((product: any) => ({
           ...product,
           isActive: product.is_active ?? true,
-          image: product.image || getDefaultImageByType(product.type),
+          image: product.image,
           rating: product.rating || 0,
           location: product.location || 'Not specified'
         }));
@@ -106,7 +106,7 @@ export function BundleEditPage() {
           type: bundle.type,
           description: bundle.description,
           price: bundle.price,
-          active: bundle.is_active ?? bundle.active ?? true,
+          active: bundle.active,
           product_ids: bundle.product_ids || []
         });
       } catch (err) {
@@ -173,7 +173,7 @@ export function BundleEditPage() {
             <div className="text-center text-red-500 py-12">{error}</div>
           ) : (
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
@@ -347,10 +347,6 @@ export function BundleEditPage() {
                                         src={product.image}
                                         alt={product.name}
                                         className="h-40 w-full object-cover transition-transform group-hover:scale-105 duration-500"
-                                        onError={e => {
-                                          const target = e.target as HTMLImageElement;
-                                          target.src = getDefaultImageByType(product.type);
-                                        }}
                                       />
                                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
                                       <div className="absolute top-3 left-3 z-10">
@@ -424,6 +420,7 @@ export function BundleEditPage() {
                   </Button>
                   <Button
                     type="submit"
+                    onClick={form.handleSubmit(onSubmit)}
                     disabled={isSubmitting}
                     className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
                   >

@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { getProducts } from '@/services/productService';
 import { createBundle } from '@/services/BundleService';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -36,16 +36,16 @@ import { Loader2, Check, ArrowLeft } from 'lucide-react';
 
 // Utility to get a default image by type
 function getDefaultImageByType(type?: string) {
-    switch (type) {
-        case 'hotel':
-            return '/images/default-hotel.jpg';
-        case 'flight':
-            return '/images/default-flight.jpg';
-        case 'tour':
-            return '/images/default-tour.jpg';
-        default:
-            return '/images/default-product.jpg';
-    }
+  switch (type) {
+    case 'hotel':
+      return '/images/default-hotel.jpg';
+    case 'flight':
+      return '/images/default-flight.jpg';
+    case 'tour':
+      return '/images/default-tour.jpg';
+    default:
+      return '/images/default-product.jpg';
+  }
 }
 
 const bundleFormSchema = z.object({
@@ -101,7 +101,7 @@ export function CreateBundleForm() {
       }
     };
     fetchProductsList();
-    return () => {};
+    return () => { };
   }, [toast]);
 
   const form = useForm<BundleFormData>({
@@ -116,29 +116,28 @@ export function CreateBundleForm() {
     }
   });
 
-    async function onSubmit(data: BundleFormData) {
-        try {
-        setIsSubmitting(true);
-        debugger
-        await createBundle({
-            ...data
-        });
-        toast({
-            title: "Bundle Created",
-            description: "Your bundle has been successfully created.",
-            variant: "default"
-        });
-        navigate('/dashboard/bundles');
-        } catch (error) {
-        toast({
-            title: "Error",
-            description: "Failed to create the bundle. Please try again.",
-            variant: "destructive"
-        });
-        } finally {
-        setIsSubmitting(false);
+  async function onSubmit(data: BundleFormData) {
+    try {
+      setIsSubmitting(true);
+      await createBundle({
+        ...data
+      });
+      toast({
+        title: "Bundle Created",
+        description: "Your bundle has been successfully created.",
+        variant: "default"
+      });
+      navigate('/dashboard/bundles');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create the bundle. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-    }
+  }
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -163,7 +162,7 @@ export function CreateBundleForm() {
         </CardHeader>
         <CardContent className="p-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
@@ -233,11 +232,10 @@ export function CreateBundleForm() {
                       <FormControl>
                         <div className="flex items-center space-x-2">
                           <div
-                            className={`h-6 w-6 rounded-full border flex items-center justify-center cursor-pointer ${
-                              field.value
+                            className={`h-6 w-6 rounded-full border flex items-center justify-center cursor-pointer ${field.value
                                 ? 'bg-green-500 border-green-500 text-white'
                                 : 'bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600'
-                            }`}
+                              }`}
                             onClick={() => form.setValue('active', !field.value)}>
                             {field.value && <Check className="h-4 w-4" />}
                           </div>
@@ -414,6 +412,7 @@ export function CreateBundleForm() {
                 </Button>
                 <Button
                   type="submit"
+                  onClick={form.handleSubmit(onSubmit)}
                   disabled={isSubmitting}
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
                 >

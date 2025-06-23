@@ -11,8 +11,7 @@ import { MiniCart } from '@/components/cart/MiniCart';
 import { useCart } from '@/components/providers/cart-provider';
 import { ShoppingCart, Eye, BadgePercent } from 'lucide-react';
 import { getActiveGradientPreset, siteConfig } from '@/config/siteConfig';
-
-// Using the Product type from @/types/product
+import { getBundlesPublic } from '@/services/bundleService';
 
 export function WelcomePage() {
   const { user } = useAuth();
@@ -23,6 +22,9 @@ export function WelcomePage() {
   const { toast } = useToast();
   const { addItem, isLoading: isCartLoading } = useCart();
   const [addingToCart, setAddingToCart] = useState<{ [key: string]: boolean }>({});
+  const [bundles, setBundles] = useState<any[]>([]);
+  const [isBundlesLoading, setIsBundlesLoading] = useState(true);
+  const [bundlesError, setBundlesError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -57,13 +59,26 @@ export function WelcomePage() {
       }
     };
     fetchProducts();
-    return () => {
+    const fetchBundles = async () => {
+      try {
+        setIsBundlesLoading(true);
+        setBundlesError(null);
+        const data = await getBundlesPublic();
+        setBundles(Array.isArray(data) ? data : []);
+      } catch (err) {
+        setBundlesError('Impossible de charger les bundles.');
+      } finally {
+        setIsBundlesLoading(false);
+      }
     };
+    fetchBundles();
+    return () => {};
   }, [toast]);
-  const handleAddToCart = async (productId: string) => {
+
+  const handleAddToCart = async (itemId: string) => {
     try {
-      setAddingToCart(prev => ({ ...prev, [productId]: true }));
-      await addItem(productId, 1);
+      setAddingToCart(prev => ({ ...prev, [itemId]: true }));
+      await addItem(itemId, 1);
       toast({
         title: 'Success',
         description: 'Item added to your cart',
@@ -76,7 +91,7 @@ export function WelcomePage() {
         variant: 'destructive',
       });
     } finally {
-      setAddingToCart(prev => ({ ...prev, [productId]: false }));
+      setAddingToCart(prev => ({ ...prev, [itemId]: false }));
     }
   };
 
@@ -345,11 +360,9 @@ export function WelcomePage() {
                             variant="outline"
                             size="sm"
                             className="flex-1 border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 relative z-20"
-                            onClick={(e) => {
-                              handleAddToCart(product.id);
-                            }}
+                            onClick={() => handleAddToCart(product.id)}
                             disabled={addingToCart[product.id] || isCartLoading}
-                            type="button" // Explicitly set button type
+                            type="button"
                           >
                             {addingToCart[product.id] ? (
                               <span className="animate-pulse">Adding...</span>
@@ -389,6 +402,120 @@ export function WelcomePage() {
           </div>
         </div>
       </main>
+
+      {/* Bundles Slider Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 text-center">
+            <h2 className="text-4xl font-extrabold text-gray-900">Bundles</h2>
+            <p className="mt-2 text-lg text-gray-600">
+              Discover our exclusive travel bundles and save more!
+            </p>
+          </div>
+          <div className="relative">
+            {/* Slider Buttons */}
+            <button
+              type="button"
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white/80 dark:bg-gray-900/80 rounded-full shadow p-2"
+              onClick={() => {
+                const container = document.getElementById('bundles-slider');
+                if (container) container.scrollBy({ left: -320, behavior: 'smooth' });
+              }}
+              aria-label="Scroll left"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div
+              id="bundles-slider"
+              className="flex gap-6 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 py-2 px-8"
+              style={{ scrollSnapType: 'x mandatory' }}
+            >
+              {isBundlesLoading ? (
+                <div className="text-center py-12 w-full">
+                  <span>Loading bundles...</span>
+                </div>
+              ) : bundlesError ? (
+                <div className="text-center py-12 w-full">
+                  <span className="text-red-500">{bundlesError}</span>
+                </div>
+              ) : bundles.length > 0 ? (
+                bundles.map((bundle) => (
+                  <Card
+                    key={bundle.id}
+                    className="min-w-[320px] max-w-[340px] flex-shrink-0 rounded-xl border bg-white dark:bg-gray-900 shadow-md relative group transition-all duration-300 hover:shadow-xl"
+                    style={{ scrollSnapAlign: 'start' }}
+                  >
+                    <CardHeader>
+                      <CardTitle className="text-xl font-bold truncate">{bundle.name}</CardTitle>
+                      <CardDescription className="truncate">{bundle.type} Bundle</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="mb-2 text-gray-500 text-sm line-clamp-2">{bundle.description}</div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-bold text-indigo-600 text-lg">${bundle.price}</span>
+                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-semibold
+                          ${bundle.active ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-500'}`}>
+                          {bundle.active ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="flex gap-2 justify-end">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        asChild
+                        className="flex items-center gap-1"
+                      >
+                        <a href={`/bundles/${bundle.id}`}>
+                          <Eye className="h-4 w-4" />
+                          View Details
+                        </a>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center gap-1 border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300"
+                        onClick={() => handleAddToCart(bundle.id)}
+                        disabled={addingToCart[bundle.id] || isCartLoading}
+                        type="button"
+                      >
+                        {addingToCart[bundle.id] ? (
+                          <span className="animate-pulse">Adding...</span>
+                        ) : (
+                          <>
+                            <ShoppingCart className="w-4 h-4 mr-1" />
+                            Add to Cart
+                          </>
+                        )}
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))
+              ) : (
+                <div className="text-center py-12 w-full">
+                  <p className="text-muted-foreground">No bundles available at the moment.</p>
+                </div>
+              )}
+            </div>
+            {/* Slider Buttons */}
+            <button
+              type="button"
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white/80 dark:bg-gray-900/80 rounded-full shadow p-2"
+              onClick={() => {
+                const container = document.getElementById('bundles-slider');
+                if (container) container.scrollBy({ left: 320, behavior: 'smooth' });
+              }}
+              aria-label="Scroll right"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200">

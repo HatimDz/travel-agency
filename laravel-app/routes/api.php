@@ -24,7 +24,9 @@ use Illuminate\Support\Facades\Route;
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-
+// Public bundles routes
+Route::get('/bundles-client', [BundleController::class, 'index']);
+Route::get('/bundles-client/{id}', [BundleController::class, 'show']);
 // Public product routes
 Route::get('/products', [\App\Http\Controllers\ProductController::class, 'index']);
 Route::get('/products/{product}', [\App\Http\Controllers\ProductController::class, 'show']);
@@ -69,7 +71,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Bundle Routes
     Route::apiResource('bundles', BundleController::class);
-    // Route::get('bundlest', [BundleController::class, 'index']);
+    Route::post('bundles/{bundle}/toggle-status', [BundleController::class, 'toggleStatus']);
 
     // Room Amenity Routes
     Route::apiResource('room-amenities', \App\Http\Controllers\API\RoomAmenityController::class);

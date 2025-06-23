@@ -13,6 +13,7 @@ import { ShopPage } from './pages/ShopPage';
 import { RequireAuth } from './components/RequireAuth';
 import { CartProvider } from './components/providers/cart-provider';
 import { DashboardRoutes } from './routes/DashboardRoutes';
+import { BundleDetail } from './pages/BundleDetail';
 
 
 // Products route component with nested routes (protected)
@@ -46,7 +47,9 @@ function App() {
         
         {/* Public product detail route */}
         <Route path="/products/:id" element={<ProductDetailPage />} />
-        
+        {/* Public bundle detail route */}
+        <Route path="/bundles/:id" element={<BundleDetail />} />
+
         {/* Cart and checkout routes */}
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />

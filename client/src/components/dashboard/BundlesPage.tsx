@@ -108,6 +108,7 @@ export function BundlesPage() {
       try {
         setLoading(true);
         const data = await getBundles();
+
         setBundles(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error fetching bundles:', error);
@@ -162,10 +163,13 @@ export function BundlesPage() {
     try {
       const bundle = bundles.find(b => b.id === id);
       if (!bundle) return;
+
       await toggleBundleStatus(id, !bundle.active);
+
       setBundles(prev => prev.map(b =>
         b.id === id ? { ...b, active: !b.active } : b
       ));
+      
       toast({
         title: bundle.active ? "Bundle Deactivated" : "Bundle Activated",
         description: `The bundle status has been updated to ${bundle.active ? 'inactive' : 'active'}.`,
