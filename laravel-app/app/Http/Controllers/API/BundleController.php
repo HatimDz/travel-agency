@@ -42,25 +42,31 @@ class BundleController extends Controller
     }
 
     // PUT /api/bundles/{id}
+
     public function update(Request $request, $id)
     {
         $bundle = Bundle::findOrFail($id);
 
         $validated = $request->validate([
-            'name' => 'sometimes|string',
-            'type' => 'sometimes|in:Silver,Gold,Platinum',
-            'description' => 'nullable|string',
-            'price' => 'sometimes|numeric',
-            'active' => 'boolean',
-            'product_ids' => 'array',
+            'name' => 'required|string|min:3',
+            'type' => 'required|in:Silver,Gold,Platinum',
+            'description' => 'required|string|min:10',
+            'price' => 'required|numeric|min:0',
+            'active' => 'required|boolean',
+            'product_ids' => 'required|array|min:1',
             'product_ids.*' => 'exists:products,id',
         ]);
 
-        $bundle->update($validated);
+        $bundle->update([
+            'name' => $validated['name'],
+            'type' => $validated['type'],
+            'description' => $validated['description'],
+            'price' => $validated['price'],
+            'active' => $validated['active'],
+        ]);
 
-        if (isset($validated['product_ids'])) {
-            $bundle->products()->sync($validated['product_ids']);
-        }
+        // Sync products
+        $bundle->products()->sync($validated['product_ids']);
 
         return response()->json($bundle->load('products'));
     }

@@ -34,20 +34,6 @@ import * as z from 'zod';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2, Check, ArrowLeft } from 'lucide-react';
 
-// Utility to get a default image by type
-// function getDefaultImageByType(type?: string) {
-//   switch (type) {
-//     case 'hotel':
-//       return '/images/default-hotel.jpg';
-//     case 'flight':
-//       return '/images/default-flight.jpg';
-//     case 'tour':
-//       return '/images/default-tour.jpg';
-//     default:
-//       return '/images/default-product.jpg';
-//   }
-// }
-
 const bundleFormSchema = z.object({
   name: z.string().min(3, { message: "Bundle name must be at least 3 characters." }),
   type: z.enum(['Silver', 'Gold', 'Platinum'], { required_error: "Please select a bundle type." }),
@@ -101,13 +87,22 @@ export function BundleEditPage() {
 
         // Fetch bundle
         const bundle = await getBundleById(id!);
+
+        // If bundle.products exists, extract product IDs from it (API response as shown in your prompt)
+        let bundleProductIds: number[] = [];
+        if (Array.isArray(bundle.products)) {
+          bundleProductIds = bundle.products.map((p: any) => Number(p.id));
+        } else if (Array.isArray(bundle.product_ids)) {
+          bundleProductIds = bundle.product_ids.map((pid: any) => Number(pid));
+        }
+
         form.reset({
           name: bundle.name,
           type: bundle.type,
           description: bundle.description,
-          price: bundle.price,
-          active: bundle.active,
-          product_ids: bundle.product_ids || []
+          price: Number(bundle.price),
+          active: !!bundle.active || !!bundle.is_active,
+          product_ids: bundleProductIds
         });
       } catch (err) {
         setError("Failed to load bundle or products.");
@@ -322,7 +317,7 @@ export function BundleEditPage() {
                                   <div
                                     key={product.id}
                                     className={`min-w-[280px] max-w-[320px] flex-shrink-0 rounded-xl border bg-white dark:bg-gray-900 shadow-md relative group transition-all duration-300
-                                      ${field.value.includes(product.id) ? 'ring-2 ring-indigo-500' : 'hover:ring-2 hover:ring-indigo-300'}
+                                      ${field.value.includes(Number(product.id)) ? 'ring-2 ring-indigo-500' : 'hover:ring-2 hover:ring-indigo-300'}
                                     `}
                                     style={{ scrollSnapAlign: 'start' }}
                                   >
@@ -331,12 +326,15 @@ export function BundleEditPage() {
                                       <input
                                         type="checkbox"
                                         className="accent-indigo-500 w-5 h-5 rounded border-gray-300"
-                                        checked={field.value.includes(product.id)}
+                                        checked={field.value.includes(Number(product.id))}
                                         onChange={e => {
+                                          const pid = Number(product.id);
                                           if (e.target.checked) {
-                                            field.onChange([...field.value, product.id]);
+                                            if (!field.value.includes(pid)) {
+                                              field.onChange([...field.value, pid]);
+                                            }
                                           } else {
-                                            field.onChange(field.value.filter((id: number) => id !== product.id));
+                                            field.onChange(field.value.filter((id: number) => id !== pid));
                                           }
                                         }}
                                       />
@@ -420,7 +418,7 @@ export function BundleEditPage() {
                   </Button>
                   <Button
                     type="submit"
-                    onClick={form.handleSubmit(onSubmit)}
+                     onClick={form.handleSubmit(onSubmit)}
                     disabled={isSubmitting}
                     className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
                   >
